@@ -1,0 +1,51 @@
+{
+  "title": "Terms and Conditions",
+  "introduction": "These Terms and Conditions govern your use of our ESG management software and services.",
+  "sections": [
+    {
+      "title": "Acceptance of Terms",
+      "content": "By accessing or using our services, you agree to be bound by these Terms and Conditions."
+    },
+    {
+      "title": "Description of Service",
+      "content": "We provide an ESG management software-as-a-service solution designed for businesses to track and report environmental, social, and governance metrics."
+    },
+    {
+      "title": "User Obligations",
+      "content": "Users agree to provide accurate information and use the service for lawful purposes in accordance with all applicable laws and regulations."
+    },
+    {
+      "title": "Intellectual Property Rights",
+      "content": "The software and its original content, features, and functionality are and will remain the exclusive property of our company and its licensors."
+    },
+    {
+      "title": "Fees and Payment",
+      "content": "Fees for our services are billed on a subscription basis and must be paid in accordance with our billing terms."
+    },
+    {
+      "title": "Privacy Policy",
+      "content": "User data is protected and handled in accordance with our Privacy Policy."
+    },
+    {
+      "title": "Limitation of Liability",
+      "content": "Our company shall not be liable for any indirect, incidental, special, consequential or punitive damages resulting from the use of our service."
+    },
+    {
+      "title": "Termination",
+      "content": "We may terminate or suspend access to our service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms and Conditions."
+    },
+    {
+      "title": "Changes to Terms",
+      "content": "We reserve the right to modify or replace these Terms at any time. Your continued use of the service after any such changes constitutes your acceptance of the new Terms."
+    },
+    {
+      "title": "Governing Law",
+      "content": "These Terms shall be governed and construed in accordance with the laws of the jurisdiction in which our company is registered, without regard to its conflict of law provisions."
+    },
+    {
+      "title": "Contact Information",
+      "content": "If you have any questions about these Terms, please contact us."
+    }
+  ],
+  "effectiveDate": "The effective date of these Terms and Conditions is [Insert Effective Date]."
+}
