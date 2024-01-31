@@ -24,6 +24,14 @@ import TotalCarbonEmission from './pages/Dashboard/TotalCarbonEmission';
 import EmployeeFootprint from './pages/Dashboard/EmployeeFootprint';
 import CarbonOffset from './pages/Dashboard/CarbonOffset';
 import ChangeInEmission from './pages/Dashboard/ChangeInEmission';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import InfoSuccess from './pages/Auth/InfoSuccess';
+import ResetPassword from './pages/Auth/ResetPassword';
+import SuccessReset from './pages/Auth/SuccessReset';
+import CompanyInfo1 from './pages/Auth/CompanyInfo1';
+import CompanyInfo2 from './pages/Auth/CompanyInfo2';
+import CompanyInfo3 from './pages/Auth/CompanyInfo3';
+import CompanyInfo4 from './pages/Auth/CompanyInfo4';
 
 const router = createBrowserRouter([
   {
@@ -42,6 +50,26 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
+    path: '/company-info-i',
+    element: <CompanyInfo1 />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/company-info-ii',
+    element: <CompanyInfo2 />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/company-info-iii',
+    element: <CompanyInfo3 />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: '/company-info-iv',
+    element: <CompanyInfo4 />,
+    errorElement: <ErrorPage />,
+  },
+  {
     element: <AccountHeader />,
     errorElement: <ErrorPage />,
 
@@ -57,6 +85,22 @@ const router = createBrowserRouter([
       {
         path: 'sign-in',
         element: <SignIn />,
+      },
+      {
+        path: 'forgot-password',
+        element: <ForgotPassword />,
+      },
+      {
+        path: 'info-success',
+        element: <InfoSuccess />,
+      },
+      {
+        path: 'reset-password',
+        element: <ResetPassword />,
+      },
+      {
+        path: 'success-reset',
+        element: <SuccessReset />,
       },
     ],
   },
