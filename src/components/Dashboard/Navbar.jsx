@@ -21,7 +21,7 @@ const Navbar = ({ onMenuClick, profileName, profileIcon }) => {
   const closeDropdown = () => setDropdownOpen(false);
 
   return (
-    <nav className="bg-slate-300 dark:bg-slate-700 shadow-md h-16 flex items-center justify-between px-4 lg:px-8 top-0 w-full z-10 py-2">
+    <nav className="sticky bg-slate-300 dark:bg-slate-700 shadow-md h-16 flex items-center justify-between px-4 lg:px-8 top-0 w-full z-10 py-2">
       <div className="flex items-center">
         <button
           onClick={onMenuClick}

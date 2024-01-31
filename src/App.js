@@ -20,6 +20,10 @@ import {
   UsersList,
   Help,
 } from './pages/Dashboard';
+import TotalCarbonEmission from './pages/Dashboard/TotalCarbonEmission';
+import EmployeeFootprint from './pages/Dashboard/EmployeeFootprint';
+import CarbonOffset from './pages/Dashboard/CarbonOffset';
+import ChangeInEmission from './pages/Dashboard/ChangeInEmission';
 
 const router = createBrowserRouter([
   {
@@ -95,6 +99,23 @@ const router = createBrowserRouter([
       {
         path: 'help',
         element: <Help />,
+      },
+
+      {
+        path: 'total-carbon-emission',
+        element: <TotalCarbonEmission />,
+      },
+      {
+        path: 'employee-carbon',
+        element: <EmployeeFootprint />,
+      },
+      {
+        path: 'offset',
+        element: <CarbonOffset />,
+      },
+      {
+        path: 'change-in-emission',
+        element: <ChangeInEmission />,
       },
     ],
   },

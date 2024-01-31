@@ -190,7 +190,7 @@ const UsersList = () => {
   };
 
   return (
-    <div className="flex flex-col bg-slate-400 dark:bg-stone-800 w-full p-4">
+    <div className="flex flex-col bg-slate-400 dark:bg-stone-800 w-full p-4 h-full">
       <div className="flex flex-row pb-3">
         <h2 className="hidden md:flex text-xl text-gray-800 dark:text-gray-100 font-semibold items-center pr-5">
           {companyName}

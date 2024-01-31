@@ -13,12 +13,15 @@ const DashboardLayout = () => {
 
   return (
     <ThemeProvider>
-      <div className="max-w-screen max-h-screen h-screen w-screen flex flex-col">
+      <div className="max-w-screen max-h-screen h-screen w-full flex flex-col">
         <Navbar onMenuClick={toggleSidebar} profileName="John Doe" />
-        <div className="w-screen h-[100%] flex">
+
+        <div className="flex flex-1 overflow-hidden">
           <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
           {/* Adjust margin to match sidebar width */}
-          <Outlet />
+          <main className="flex flex-1 overflow-y-auto">
+            <Outlet />
+          </main>
         </div>
       </div>
     </ThemeProvider>

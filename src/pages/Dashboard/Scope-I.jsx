@@ -14,7 +14,7 @@ const ScopeI = () => {
   const handleToggleModal = () => setModalOpen(!isModalOpen);
 
   return (
-    <div className="flex flex-col bg-slate-400 dark:bg-stone-800 w-full">
+    <div className="flex flex-col bg-slate-400 dark:bg-stone-800 w-full h-full overflow-auto">
       <div className="hidden lg:flex pl-10 mt-10">
         <GuidelineModalToggleButton
           onClick={handleToggleModal}

@@ -77,17 +77,17 @@ const Sidebar = ({ isOpen, onClose }) => {
   return (
     <aside
       ref={sidebarRef}
-      className={`fixed top-0 left-0 h-full min-w-64 bg-slate-50 dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 z-30 transform ${
+      className={`flex flex-shrink-0 fixed top-0 left-0 h-full w-64 bg-slate-50 dark:bg-gray-800 shadow-md border-r border-gray-200 dark:border-gray-700 z-30 transform ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       } ease-in-out transition-all duration-300 lg:relative lg:translate-x-0 overflow-y-auto`}
     >
-      <div className="p-4 flex justify-end lg:hidden">
+      <div className="absolute top-0 right-0 p-4 lg:hidden">
         <FiX
           onClick={onClose}
           className="text-gray-500 dark:text-gray-200 cursor-pointer"
         />
       </div>
-      <nav className="mt-10">
+      <nav className="mt-10 w-full">
         {navLinks.map((link, index) => (
           <ToolTipNavLink
             key={index}

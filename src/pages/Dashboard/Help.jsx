@@ -145,7 +145,7 @@ const Help = () => {
   };
 
   return (
-    <div className="flex flex-col bg-slate-400 dark:bg-stone-800 w-full p-4">
+    <div className="flex flex-col bg-slate-400 dark:bg-stone-800 w-full p-4 h-full">
       <div className="flex flex-col h-full">
         <SearchBar onSearch={handleSearch} />
         <div className="flex flex-col h-full overflow-y-auto">

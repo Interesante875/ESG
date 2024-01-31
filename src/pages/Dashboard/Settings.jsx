@@ -89,7 +89,7 @@ const Settings = () => {
   }
 
   return (
-    <div className="flex flex-col bg-slate-400 dark:bg-stone-800 w-full p-4 md:pl-10 overflow-y-auto">
+    <div className="flex flex-col bg-slate-400 dark:bg-stone-800 w-full p-4 md:pl-10 overflow-y-auto h-full">
       <div className="flex flex-row justify-start items-center">
         <p className="font-bold text-3xl text-slate-800 dark:text-amber-200">
           Profile
