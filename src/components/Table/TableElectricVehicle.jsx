@@ -17,7 +17,7 @@ import {
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { useMemo, useState } from 'react';
 
-const TableMobileCombustion = ({
+const TableElectricVehicle = ({
   data,
   columns,
   selectedRows,
@@ -299,4 +299,4 @@ const TableMobileCombustion = ({
   );
 };
 
-export default TableMobileCombustion;
+export default TableElectricVehicle;

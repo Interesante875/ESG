@@ -10,7 +10,7 @@ export const StationaryCombustionCard = () => (
     icon={<LuFuel />}
     title="Stationary Combustion"
     description="The process of burning fuels in fixed locations, such as power plants or industrial furnaces."
-    link="/Table-Stationary-Combustion"
+    link="/scope-i/stationary-combustion"
     bgColor="bg-blue-600 dark:bg-blue-800"
     textColor="text-white"
   />
@@ -22,7 +22,7 @@ export const MobileCombustionCard = () => (
     icon={<LiaCarSideSolid />}
     title="Mobile Combustion"
     description="The combustion of fuels in mobile sources like vehicles or aircraft engines."
-    link="/Table-Mobile-Combustion"
+    link="/scope-i/mobile-combustion"
     bgColor="bg-green-600 dark:bg-green-800"
     textColor="text-white"
   />
@@ -34,7 +34,7 @@ export const FugitiveEmissionCard = () => (
     icon={<BsSnow />}
     title="Fugitive Emission"
     description="The unintentional release of pollutants during industrial activities, including leaks or evaporation."
-    link="/Table-Fugitive-Emission"
+    link="/scope-i/fugitive-emission"
     bgColor="bg-purple-600 dark:bg-purple-800"
     textColor="text-white"
   />

@@ -9,7 +9,7 @@ export const BusinessTravelCard = () => (
     icon={<MdCardTravel />}
     title="Business Travel"
     description="Emissions from employee travel for business purposes, including various transportation modes that are not owned or controlled by the organization."
-    link="/Table-Business-Travel"
+    link="/scope-iii/business-travel"
     bgColor="bg-blue-600 dark:bg-blue-800"
     textColor="text-white"
   />
@@ -21,7 +21,7 @@ export const EmployeeCommutingCard = () => (
     icon={<BiBuildingHouse />}
     title="Employee Commuting"
     description="Emissions from the employee transportation between worksites and home, including various transportation modes that are not owned or operated by the organization."
-    link="/Table-Employee-Commuting"
+    link="/scope-iii/employee-commuting"
     bgColor="bg-pink-600 dark:bg-pink-800"
     textColor="text-white"
   />

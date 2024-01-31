@@ -8,7 +8,7 @@ export const EnergyPurchasesCard = () => (
     icon={<RiFlashlightLine />}
     title="Energy Purchase"
     description="Including the purchases of electricity, steam, heat, or cooling."
-    link="/Table-Energy-Purchase"
+    link="/scope-ii/energy-purchase"
     bgColor="bg-green-600 dark:bg-green-900"
     textColor="text-white"
   />
@@ -20,7 +20,7 @@ export const ElectricVehicleCard = () => (
     icon={<LiaCarBatterySolid />}
     title="Electric Vehicle"
     description="Electricity purchased or used for electric vehicles (was not included in Scope 1)."
-    link="/Table-Electric-Vehicle"
+    link="/scope-ii/electric-vehicle"
     bgColor="bg-cyan-600 dark:bg-cyan-800"
     textColor="text-white"
   />

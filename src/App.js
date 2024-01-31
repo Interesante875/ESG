@@ -1,9 +1,5 @@
-import React, { useEffect } from 'react';
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Navigate,
-} from 'react-router-dom';
+import React from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { SignUp, SignIn, SignOut } from './pages/Auth';
 import ErrorPage from './pages/Error/ErrorPage';
 import AccountHeader from './components/Auth/AccountHeader';
@@ -20,6 +16,16 @@ import {
   UsersList,
   Help,
 } from './pages/Dashboard';
+import {
+  ReportBusinessTravel,
+  ReportElectricVehicle,
+  ReportEmployeeCommuting,
+  ReportEnergyPurchase,
+  ReportFugitiveEmission,
+  ReportMobileCombustion,
+  ReportStationaryCombustion,
+} from './pages/Table';
+
 import TotalCarbonEmission from './pages/Dashboard/TotalCarbonEmission';
 import EmployeeFootprint from './pages/Dashboard/EmployeeFootprint';
 import CarbonOffset from './pages/Dashboard/CarbonOffset';
@@ -113,16 +119,60 @@ const router = createBrowserRouter([
         element: <Statistics />,
       },
       {
+        path: 'main/total-carbon-emission',
+        element: <TotalCarbonEmission />,
+      },
+      {
+        path: 'main/employee-carbon',
+        element: <EmployeeFootprint />,
+      },
+      {
+        path: 'main/offset',
+        element: <CarbonOffset />,
+      },
+      {
+        path: 'main/change-in-emission',
+        element: <ChangeInEmission />,
+      },
+      {
         path: 'scope-i',
         element: <ScopeI />,
+      },
+      {
+        path: 'scope-i/stationary-combustion',
+        element: <ReportStationaryCombustion />,
+      },
+      {
+        path: 'scope-i/mobile-combustion',
+        element: <ReportMobileCombustion />,
+      },
+      {
+        path: 'scope-i/fugitive-emission',
+        element: <ReportFugitiveEmission />,
       },
       {
         path: 'scope-ii',
         element: <ScopeII />,
       },
       {
+        path: 'scope-ii/energy-purchase',
+        element: <ReportEnergyPurchase />,
+      },
+      {
+        path: 'scope-ii/electric-vehicle',
+        element: <ReportElectricVehicle />,
+      },
+      {
         path: 'scope-iii',
         element: <ScopeIII />,
+      },
+      {
+        path: 'scope-iii/business-travel',
+        element: <ReportBusinessTravel />,
+      },
+      {
+        path: 'scope-iii/employee-commuting',
+        element: <ReportEmployeeCommuting />,
       },
       {
         path: 'feedback',
@@ -143,23 +193,6 @@ const router = createBrowserRouter([
       {
         path: 'help',
         element: <Help />,
-      },
-
-      {
-        path: 'total-carbon-emission',
-        element: <TotalCarbonEmission />,
-      },
-      {
-        path: 'employee-carbon',
-        element: <EmployeeFootprint />,
-      },
-      {
-        path: 'offset',
-        element: <CarbonOffset />,
-      },
-      {
-        path: 'change-in-emission',
-        element: <ChangeInEmission />,
       },
     ],
   },

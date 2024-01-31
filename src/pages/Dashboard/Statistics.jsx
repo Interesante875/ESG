@@ -27,28 +27,28 @@ const Statistics = () => {
           value={4.51}
           unit={'kgCO2e'}
           Icon={TbSum}
-          link="/total-carbon-emission"
+          link="/main/total-carbon-emission"
         />
         <BoxCard
           title={'Yearly Change in Carbon Percentage'}
           value={4.51}
           unit={'%'}
           Icon={GrCycle}
-          link="/change-in-emission"
+          link="/main/change-in-emission"
         />
         <BoxCard
           title={'Carbon Offset'}
           value={4.51}
           unit={'kgCO2e'}
           Icon={MdOutlineSsidChart}
-          link="/offset"
+          link="/main/offset"
         />
         <BoxCard
           title={'Carbon Footprint per Employee'}
           value={4.51}
           unit={'average kgCO2e'}
           Icon={MdPeopleOutline}
-          link="/employee-carbon"
+          link="/main/employee-carbon"
         />
       </div>
 
