@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { DateTime } from 'luxon';
-import { TableStationaryCombustion } from '../../components/Table';
+import {
+  TableEmployeeCommuting,
+  TableStationaryCombustion,
+} from '../../components/Table';
 import { columnDefinition } from '../../components/Table/column';
 import axios from 'axios';
 import { FiPlus, FiTrash } from 'react-icons/fi';
@@ -122,87 +125,53 @@ const ReportEmployeeCommuting = () => {
   };
 
   function sourceOption() {
-    const gasFuel = [
-      'Butane',
-      'CNG',
-      'LNG',
-      'LPG',
-      'Natural gas',
-      'Natural gas (100% mineral blend)',
-      'Other petroleum gas',
-      'Propane',
+    const flights = [
+      'Average Passenger',
+      'Economy Class',
+      'Premium Economy Class',
+      'Business Class',
+      'First Class',
     ];
-    const liquidFuel = [
-      'Aviation spirit',
-      'Aviation turbine fuel',
-      'Burning oil',
-      'Diesel (average biofuel blend)',
-      'Diesel (100% mineral diesel)',
-      'Fuel oil',
-      'Gas oil',
-      'Lubricants',
-      'Naphtha',
-      'Petrol (average biofuel blend)',
-      'Petrol (100% mineral petrol)',
-      'Processed fuel oils - residual oil',
-      'Processed fuel oils - distillate oil',
-      'Refinery miscellaneous',
-      'Waste oils',
-      'Marine gas oil',
-      'Marine fuel oil',
+    const ferry = ['Foot Passenger', 'Car Passenger', 'Bus Passenger'];
+    const land = [
+      'Mini-sized Car',
+      'Medium-sized Car',
+      'Large-sized Car',
+      'Average-sized Car',
+      'Mini-sized Motorcycle',
+      'Medium-sized Motorcycle',
+      'Large-sized Motorcycle',
+      'Average-sized Motorcycle',
+      'Taxi/E-hailing',
+      'Bus',
+      'Monorail',
+      'LRT',
+      'MRT',
     ];
-    const solidFuel = [
-      'Coal (industrial)',
-      'Coal (electricity generation)',
-      'Coal (domestic)',
-      'Coking coal',
-      'Petroleum coke',
-      'Coal (electricity generation - home produced coal only)',
-    ];
-    const biofuel = [
-      'Bioethanol',
-      'Biodiesel ME',
-      'Biomethane (compressed)',
-      'Biodiesel ME (from used cooking oil)',
-      'Biodiesel ME (from tallow)',
-      'Biodiesel HVO',
-      'Biopropane',
-      'Development diesel',
-      'Development petrol',
-      'Off road biodiesel',
-      'Biomethane (liquified)',
-      'Methanol (bio)',
-      'Avtur (renewable)',
-    ];
-    const biomass = ['Wood logs', 'Wood chips', 'Wood pellets', 'Grass/straw'];
-    const biogas = ['Biogas', 'Landfill gas'];
 
     switch (editableData.type) {
-      case 'Gaseous Fuels':
-        return gasFuel;
-      case 'Liquid Fuels':
-        return liquidFuel;
-      case 'Solid Fuels':
-        return solidFuel;
-      case 'Biofuel':
-        return biofuel;
-      case 'Biomass':
-        return biomass;
-      case 'Biogas':
-        return biogas;
+      case 'Air':
+        return flights;
+      case 'Sea':
+        return ferry;
+      case 'Land':
+        return land;
       default:
-        return gasFuel;
+        return land;
     }
   }
 
   function unitOption() {
-    const fuels = ['Tonnes', 'Litres'];
-    const bioenergy = ['Litres', 'GigaJoule', 'Kilogram'];
+    const land = ['Kilometres', 'Miles'];
+    const sea = ['Passenger per km', 'Passenger per Nautical miles'];
+    const air = ['Kilometres', 'Miles', 'Nautical miles'];
 
-    if (editableData.type.includes('Fuels')) {
-      return fuels;
+    if (editableData.type.includes('Air')) {
+      return air;
+    } else if (editableData.type.includes('Sea')) {
+      return sea;
     } else {
-      return bioenergy;
+      return land;
     }
   }
 
@@ -214,7 +183,7 @@ const ReportEmployeeCommuting = () => {
     <div className="flex flex-col bg-slate-400 dark:bg-stone-800 text-black dark:text-white p-4 md:p-10 w-full overflow-y-auto h-full">
       <div className="flex flex-col md:flex-row justify-between items-center mb-4">
         <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-0 dark:text-white">
-          Stationary Combustion Reporting
+          Employee Commuting Reporting
         </h2>
         <div className="flex space-x-2">
           <button
@@ -236,7 +205,7 @@ const ReportEmployeeCommuting = () => {
         </div>
       </div>
       {/* {showContentModal && <MyModal onClose={() => setShowContentModal(false)} />} */}
-      <TableStationaryCombustion
+      <TableEmployeeCommuting
         data={data}
         columns={column}
         selectedRows={selectedRows}
@@ -293,12 +262,9 @@ const ReportEmployeeCommuting = () => {
                   required
                 >
                   <option value="">Select Type</option>
-                  <option value="Gaseous Fuels">Gaseous Fuels</option>
-                  <option value="Liquid Fuels">Liquid Fuels</option>
-                  <option value="Solid Fuels">Solid Fuels</option>
-                  <option value="Biofuel">Biofuel</option>
-                  <option value="Biomass">Biomass</option>
-                  <option value="Biogas">Biogas</option>
+                  <option value="Air">Employee Commuting - Air</option>
+                  <option value="Sea">Employee Commuting - Sea</option>
+                  <option value="Land">Employee Commuting - Land</option>
                 </select>
               </div>
 

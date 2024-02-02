@@ -26,11 +26,11 @@ const navLinks = [
 
   { name: 'Feedback', to: '/feedback', icon: <MdOutlineLiveHelp /> },
   { name: 'Users', to: '/userlist', icon: <IoMdPerson /> },
-  {
-    name: 'Subscription',
-    to: '/subscription',
-    icon: <MdOutlineSubscriptions />,
-  },
+  // {
+  //   name: 'Subscription',
+  //   to: '/subscription',
+  //   icon: <MdOutlineSubscriptions />,
+  // },
   { name: 'Settings', to: '/settings', icon: <GoGear /> },
   { name: 'Help', to: '/help', icon: <IoIosHelpCircleOutline /> },
   { name: 'Sign out', to: '/sign-out', icon: <RiLogoutBoxLine /> },
