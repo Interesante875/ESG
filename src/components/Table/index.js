@@ -5,3 +5,4 @@ export { default as TableEnergyPurchase } from './TableEnergyPurchase';
 export { default as TableElectricVehicle } from './TableElectricVehicle';
 export { default as TableBusinessTravel } from './TableBusinessTravel';
 export { default as TableEmployeeCommuting } from './TableEmployeeCommuting';
+export { default as TableUserList } from './TableUserList';

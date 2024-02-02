@@ -241,7 +241,9 @@ const ReportEmployeeCommuting = () => {
       {showContentModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex justify-center items-center p-4">
           <div className="bg-white dark:bg-gray-800 w-full max-w-lg mx-auto rounded shadow-lg overflow-hidden p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-semibold mb-4">Add New Data</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              {modalMode === 'edit' ? 'Edit Data' : 'Add New Data'}
+            </h2>
             <form onSubmit={handleAddNewSubmit}>
               {/* Type Dropdown */}
               <div className="mb-4">

@@ -1,17 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { FiMoon, FiSun, FiSunrise, FiX } from 'react-icons/fi';
+import React, { useEffect, useRef } from 'react';
+import { FiMoon, FiSun, FiX } from 'react-icons/fi';
 import { PiGasPump } from 'react-icons/pi';
 import { IoFlashOutline, IoCarSportOutline } from 'react-icons/io5';
-import { RiProfileFill } from 'react-icons/ri';
 import {
-  MdOutlineMessage,
   MdOutlineSubscriptions,
   MdOutlineLiveHelp,
   MdWindow,
 } from 'react-icons/md';
 import { GoGear } from 'react-icons/go';
-import { LuMoonStar } from 'react-icons/lu';
 import { RiLogoutBoxLine } from 'react-icons/ri';
 import { IoMdPerson } from 'react-icons/io';
 import { IoIosHelpCircleOutline } from 'react-icons/io';

@@ -45,3 +45,31 @@ export const columnDefinition = [
   //   cell: ({ row }) => <button onClick={() => {}}>Edit</button>,
   // },
 ];
+
+export const columnDefinitionUsers = [
+  {
+    header: 'Username',
+    accessorKey: 'username',
+    footer: 'Username',
+  },
+  {
+    header: 'Full Name',
+    accessorKey: 'name',
+    footer: 'Full Name',
+  },
+  {
+    header: 'Email',
+    accessorKey: 'email',
+    footer: 'Email',
+  },
+  {
+    header: 'Gender',
+    accessorKey: 'gender',
+    footer: 'Gender',
+  },
+  {
+    header: 'User Role',
+    accessorKey: 'userRole',
+    footer: 'User Role',
+  },
+];

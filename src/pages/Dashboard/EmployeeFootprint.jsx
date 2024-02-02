@@ -132,7 +132,7 @@ const EmployeeFootprint = () => {
               value={data.value}
               unit={'kgCO2e'}
               Icon={MdPeopleOutline}
-              link={`/employee-carbon/${data.id}`}
+              // link={`/employee-carbon/${data.id}`}
             />
           ))}
         </div>
