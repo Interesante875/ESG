@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HiEye, HiX } from 'react-icons/hi';
 import { IoIosInformationCircle } from 'react-icons/io';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import terms from '../../components/Auth/terms-and-conditions.json';
+import axios from '../../api/axios';
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showModal, setShowModal] = useState(false);
   const [modalBorderColor, setModalBorderColor] = useState('border-gray-300');
 
@@ -26,22 +28,61 @@ const SignUp = () => {
   //To let the user peak the password input
   const [show, setShow] = useState(false);
 
+  const [passwordStrength, setPasswordStrength] = useState('');
+  const [termsChecked, setTermsChecked] = useState(false);
+  const [submitDisabled, setSubmitDisabled] = useState(true);
   /**
    * To store the user input to variable values
    * @param {*} e
    */
-  function handleChange(e) {
-    setValues({ ...values, [e.target.name]: e.target.value });
-  }
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (type === 'checkbox') {
+      setTermsChecked(checked);
+    } else {
+      setValues({ ...values, [name]: value });
+    }
+  };
 
   /**
    * To store the error message and show to the user
    * @param {*} e
    */
-  function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // setError(signupValidation(values))
-  }
+    // Example password strength validation
+    if (passwordStrength !== 'Strong') {
+      setError('Password is too weak.');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        '/api/v1/auth/register',
+        JSON.stringify(values)
+      );
+      // Navigate on successful registration
+      navigate('/info-success', { state: { from: location }, replace: true });
+    } catch (err) {
+      // Handle specific status codes
+      if (err.response) {
+        switch (err.response.status) {
+          case 409:
+            setError('Email Address has registered for an account already.');
+            break;
+          case 400:
+            setError('Invalid request. Please check your input.');
+            break;
+          default:
+            setError('An unexpected error occurred. Please try again later.');
+        }
+      } else if (err.request) {
+        setError('The request was made but no response was received.');
+      } else {
+        setError('Error setting up the request.');
+      }
+    }
+  };
 
   const openModal = () => {
     setShowModal(true);
@@ -58,6 +99,28 @@ const SignUp = () => {
     }
   };
 
+  // Include checks for password strength and adjust the `passwordStrength` state accordingly
+  useEffect(() => {
+    const strongPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W|_).{8,}$/;
+    if (strongPasswordRegex.test(values.password)) {
+      setPasswordStrength('Strong');
+      setError('');
+    } else {
+      setPasswordStrength('Weak');
+      setError(
+        'Password must be at least 8 characters long, including a number, uppercase letter, lowercase letter, and a special character.'
+      );
+    }
+
+    const isFormValid =
+      values.name &&
+      values.email &&
+      strongPasswordRegex.test(values.password) &&
+      termsChecked;
+    setSubmitDisabled(!isFormValid);
+  }, [values, termsChecked]);
+
   return (
     <div className="max-h-screen bg-slate-50 container">
       <div className="h-screen flex-col flex justify-center items-start pl-32 pr-24 py-32">
@@ -73,7 +136,7 @@ const SignUp = () => {
         <form className="w-10/12" onSubmit={handleSubmit}>
           <div className="mb-5">
             <label
-              for="full_name"
+              htmlFor="full_name"
               className="block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
             >
               Full Name <span className="text-red-600">*</span>
@@ -105,7 +168,7 @@ const SignUp = () => {
           </div>
           <div className="mb-5">
             <label
-              for="email"
+              htmlFor="email"
               className="block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
             >
               Email Address <span className="text-red-600">*</span>
@@ -139,7 +202,7 @@ const SignUp = () => {
           </div>
           <div className="mb-5">
             <label
-              for="password"
+              htmlFor="password"
               className="mb-2 text-base font-extrabold flex font-['Inter'] text-white-900 dark:text-white"
             >
               Password{' '}
@@ -179,7 +242,12 @@ const SignUp = () => {
                 </button>
               </span>
             </div>
-
+            {/* Display password strength message */}
+            {passwordStrength && (
+              <div
+                className={`message ${passwordStrength}`}
+              >{`Password Strength: ${passwordStrength}`}</div>
+            )}
             {error.password && (
               <p className=" text-red-500 font-['Inter] text-xs font-normal flex">
                 {error.password}
@@ -187,26 +255,30 @@ const SignUp = () => {
             )}
           </div>
           <div className="flex items-center font-['Inter']  mt-3 mb-3">
-            <input
-              id="link-checkbox"
-              type="checkbox"
-              value=""
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              required
-            ></input>
-            <label
-              for="link-checkbox"
-              className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              I agree with the{' '}
-              <a
-                onClick={openModal}
-                className="text-teal-600 dark:text-teal-500 hover:underline cursor-pointer"
+            {/* Terms and Conditions Checkbox */}
+            <div className="flex items-center">
+              <input
+                id="termsCheckbox"
+                name="termsCheckbox"
+                type="checkbox"
+                checked={termsChecked}
+                onChange={handleChange}
+                className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="termsCheckbox"
+                className="ml-2 block text-sm text-gray-900"
               >
-                Terms and Conditions
-              </a>
-              .
-            </label>
+                I agree to the{' '}
+                <span
+                  className="text-teal-600 cursor-pointer"
+                  onClick={openModal}
+                >
+                  Terms and Conditions
+                </span>
+                .
+              </label>
+            </div>
 
             {showModal && (
               <div
@@ -253,13 +325,21 @@ const SignUp = () => {
 
           <button
             type="submit"
-            className="w-full text-white text-sm font-semibold font-['Inter'] h-12 px-10 py-2.5 bg-teal-600 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-500 rounded-md dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+            disabled={submitDisabled}
+            className={`w-full text-white font-semibold h-12 px-10 py-2.5 ${
+              submitDisabled ? 'bg-gray-300' : 'bg-teal-600 hover:bg-teal-800'
+            } rounded-md`}
           >
-            Submit
+            Register
           </button>
+
+          {/* Error Display */}
+          {error && (
+            <div className="mt-2 text-center text-sm text-red-600">{error}</div>
+          )}
         </form>
       </div>
-      <div className="Frame1000004608 right-4 top-4 absolute justify-right items-center gap-3 inline-flex">
+      <div className="right-4 top-4 absolute justify-right items-center gap-3 inline-flex">
         <div className="text-teal-600 text-sm font-semibold font-['Inter'] leading-normal">
           Have an existing account?
         </div>

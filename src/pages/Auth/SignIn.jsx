@@ -1,7 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import useAuth from '../../hooks/useAuth';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { HiEye } from 'react-icons/hi';
+import axios from '../../api/axios';
 
 const SignIn = () => {
+  const { setAuth } = useAuth();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/main';
   //The email and password from the user input will be saved in this variable
   const [values, setValues] = useState({
     email: '',
@@ -26,9 +34,59 @@ const SignIn = () => {
    * To store the error message and show to the user when the user click the button
    * @param {*} e
    */
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // setError(loginValidation(values));
+    // Reset errors
+    setError({});
+
+    try {
+      const response = await axios.post('/api/v1/auth/login', values); // Adjust API endpoint as needed
+      const accessToken = response?.data?.accessToken;
+
+      if (accessToken) {
+        setAuth({
+          ...values,
+          accessToken,
+        });
+
+        // Clear input fields after successful login
+        setValues({ email: '', password: '' });
+        // console.log(from);
+        // console.log(accessToken);
+        // Navigate to 'from' route or '/main' if no redirect route is provided
+        navigate(from, { replace: true }); // Un-comment this line to use dynamic navigation
+        // navigate('/main'); // Comment or remove this line if dynamic navigation is preferred
+      }
+    } catch (error) {
+      if (!error.response) {
+        // Network error or server is not responding
+        setError({ general: 'Network error or server is not responding.' });
+      } else {
+        // Handle errors based on status code
+        switch (error.response.status) {
+          case 400:
+            setError({
+              general: 'Invalid request. Please enter correct details.',
+            });
+            break;
+          case 401:
+            setError({ general: 'Invalid credentials.' });
+            break;
+          case 403:
+            setError({
+              general: 'Account is not activated. Please verify your email.',
+            });
+            break;
+          case 404:
+            setError({ general: 'User not found.' });
+            break;
+          default:
+            setError({
+              general: 'An unexpected error occurred. Please try again.',
+            });
+        }
+      }
+    }
   }
 
   return (
@@ -43,9 +101,12 @@ const SignIn = () => {
         </div>
 
         <form className="w-10/12" onSubmit={handleSubmit}>
+          {error.general && (
+            <div className="mb-4 text-center text-red-500">{error.general}</div>
+          )}
           <div className="mb-5">
             <label
-              for="email"
+              htmlFor="email"
               className="block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
             >
               Email Address <span className="text-red-600">*</span>
@@ -77,7 +138,7 @@ const SignIn = () => {
           </div>
           <div className="mb-5">
             <label
-              for="password"
+              htmlor="password"
               className="mb-2 text-base font-extrabold flex font-['Inter'] text-white-900 dark:text-white"
             >
               Password <span className="ml-1 text-red-600 flex">*</span>
@@ -128,7 +189,7 @@ const SignIn = () => {
                 required
               ></input>
               <label
-                for="link-checkbox"
+                htmlFor="link-checkbox"
                 className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
               >
                 Remember me

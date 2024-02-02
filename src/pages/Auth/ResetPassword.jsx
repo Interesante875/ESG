@@ -10,6 +10,7 @@ export default function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [showVPassword, setShowVPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState('');
+  const [passwordStrengthLevel, setPasswordStrengthLevel] = useState(''); // New state for strength level
   const [submitDisabled, setSubmitDisabled] = useState(true);
 
   const passwordRef = useRef(null);
@@ -42,12 +43,15 @@ export default function ResetPassword() {
 
     if (strongPasswordRegex.test(values.password)) {
       setPasswordStrength('Strong');
+      setPasswordStrengthLevel('strong');
       setSubmitDisabled(false);
     } else if (moderatePasswordRegex.test(values.password)) {
       setPasswordStrength('Moderate');
-      setSubmitDisabled(true);
+      setPasswordStrengthLevel('moderate');
+      setSubmitDisabled(false);
     } else {
       setPasswordStrength('Weak');
+      setPasswordStrengthLevel('weak');
       setSubmitDisabled(true);
     }
 
@@ -102,6 +106,12 @@ export default function ResetPassword() {
               </span>
             </div>
           </div>
+
+          {passwordStrength && <div>Password strength: {passwordStrength}</div>}
+          {/* Password strength color bar indicator */}
+          <div
+            className={`bg-${passwordStrengthLevel}-600 h-1 w-full mt-2`}
+          ></div>
           <div className="mb-4" ref={verifyPasswordRef}>
             {/* Verify password input field */}
             <label
@@ -127,7 +137,7 @@ export default function ResetPassword() {
               </span>
             </div>
           </div>
-          {passwordStrength && <div>Password strength: {passwordStrength}</div>}
+
           <button
             type="submit"
             disabled={submitDisabled}
