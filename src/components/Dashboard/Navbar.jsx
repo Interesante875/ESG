@@ -1,10 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { FiMenu, FiSettings, FiLogOut, FiCreditCard } from 'react-icons/fi';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import AuthContext from '../../contexts/AuthProvider';
+import useLogout from '../../hooks/useLogout';
 
 const Navbar = ({ onMenuClick, profileName, profileIcon }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
+  const logout = useLogout();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -19,6 +23,14 @@ const Navbar = ({ onMenuClick, profileName, profileIcon }) => {
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
   const closeDropdown = () => setDropdownOpen(false);
+
+  // Define the logout function
+  const handleLogout = async () => {
+    closeDropdown(); // Ensure the dropdown is closed upon logout
+    // Logout logic goes here (e.g., clear auth token, update state, redirect)
+    await logout();
+    navigate('/sign-in'); // Redirect to sign-in page
+  };
 
   return (
     <nav className="sticky bg-slate-300 dark:bg-slate-700 shadow-md h-16 flex items-center justify-between px-4 lg:px-8 top-0 w-full z-10 py-2">
@@ -90,7 +102,7 @@ const Navbar = ({ onMenuClick, profileName, profileIcon }) => {
             <NavLink
               to="/sign-out"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
-              onClick={closeDropdown}
+              onClick={handleLogout}
             >
               <FiLogOut className="inline mr-2" /> Sign Out
             </NavLink>

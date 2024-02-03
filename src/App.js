@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { SignUp, SignIn, SignOut } from './pages/Auth';
+import { SignUp, SignIn, SignOut, Lounge } from './pages/Auth';
 import ErrorPage from './pages/Error/ErrorPage';
 import AccountHeader from './components/Auth/AccountHeader';
 import HomePage from './pages/HomePage';
@@ -76,6 +76,10 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
+    path: '/lounge',
+    element: <Lounge />,
+  },
+  {
     element: <AccountHeader />,
     errorElement: <ErrorPage />,
 
@@ -101,7 +105,7 @@ const router = createBrowserRouter([
         element: <InfoSuccess />,
       },
       {
-        path: 'reset-password',
+        path: 'reset-password/:token', // Add :token to make the route dynamic
         element: <ResetPassword />,
       },
       {

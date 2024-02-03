@@ -16,23 +16,27 @@ const DashboardLayout = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  return auth?.email ? (
-    <ThemeProvider>
-      <div className="max-w-screen max-h-screen h-screen w-full flex flex-col">
-        <Navbar onMenuClick={toggleSidebar} profileName="John Doe" />
+  if (auth?.companyName) {
+    return (
+      <ThemeProvider>
+        <div className="max-w-screen max-h-screen h-screen w-full flex flex-col">
+          <Navbar onMenuClick={toggleSidebar} profileName={auth?.username} />
 
-        <div className="flex flex-1 overflow-hidden">
-          <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
-          {/* Adjust margin to match sidebar width */}
-          <main className="flex flex-1 overflow-y-auto">
-            <Outlet />
-          </main>
+          <div className="flex flex-1 overflow-hidden">
+            <Sidebar isOpen={sidebarOpen} onClose={toggleSidebar} />
+            {/* Adjust margin to match sidebar width */}
+            <main className="flex flex-1 overflow-y-auto">
+              <Outlet />
+            </main>
+          </div>
         </div>
-      </div>
-    </ThemeProvider>
-  ) : (
-    <Navigate to="/sign-in" state={{ from: location }} replace />
-  );
+      </ThemeProvider>
+    );
+  } else if (auth?.username) {
+    return <Navigate to="/lounge" state={{ from: location }} replace />;
+  } else {
+    return <Navigate to="/sign-in" state={{ from: location }} replace />;
+  }
 };
 
 export default DashboardLayout;

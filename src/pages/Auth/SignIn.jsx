@@ -42,10 +42,15 @@ const SignIn = () => {
     try {
       const response = await axios.post('/api/v1/auth/login', values); // Adjust API endpoint as needed
       const accessToken = response?.data?.accessToken;
+      const username = response?.data?.username;
+      const companyName = response?.data?.companyName;
+
+      // console.log(response?.data);
 
       if (accessToken) {
         setAuth({
-          ...values,
+          username,
+          companyName,
           accessToken,
         });
 

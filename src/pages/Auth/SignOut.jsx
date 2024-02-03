@@ -4,16 +4,16 @@ import { useNavigate } from 'react-router-dom';
 
 const SignOut = () => {
   const navigate = useNavigate();
-  const [errorTrigger, setErrorTrigger] = useState(false);
+  // const [errorTrigger, setErrorTrigger] = useState(false);
 
-  const throwError = () => {
-    setErrorTrigger(true);
-  };
+  // const throwError = () => {
+  //   setErrorTrigger(true);
+  // };
 
-  if (errorTrigger) {
-    // Deliberately throw an error
-    throw new Error('Deliberate Error Triggered');
-  }
+  // if (errorTrigger) {
+  //   // Deliberately throw an error
+  //   throw new Error('Deliberate Error Triggered');
+  // }
 
   const handleNavigation = () => {
     navigate('/home');
