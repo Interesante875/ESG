@@ -28,6 +28,7 @@ export default function CompanyInfo4() {
         const { name, value } = evnt.target;
         setInputs({...inputs, [name]: value})
     }
+    
 
 
     return(
@@ -167,7 +168,7 @@ export default function CompanyInfo4() {
           <button className="text-sm justify-center items-center h-12 px-10 py-2.5 rounded-md border border-teal-600 text-center text-teal-600 text-sm font-semibold font-['Inter'] hover:border-teal-800 hover:text-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-500 dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800">Back</button>
         </div>
         <div className = "justify-end flex items-end">
-        <button type="submit" className=" text-white text-sm font-semibold font-['Inter'] h-12 px-10 py-2.5 bg-teal-600 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-500 rounded-md dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800">Next</button>
+        <button type="submit" className=" text-white text-sm font-semibold font-['Inter'] h-12 px-10 py-2.5 bg-teal-600 hover:bg-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-500 rounded-md dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800">Submit</button>
         </div>
       </div>
     </form>

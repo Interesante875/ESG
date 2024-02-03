@@ -8,7 +8,7 @@ export default function CompanyInfo2() {
           <ol className="md:ml-10 lg:ml-8 w-full sm:flex">
             <li className="relative mb-6 sm:mb-0 ">
               <div className="flex items-center">
-                <div className=" z-10 flex items-center justify-center w-6 h-6 bg-teal-500 rounded-full ring-1 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0">
+                <div className="z-10 flex items-center justify-center w-6 h-6 bg-teal-500 rounded-full ring-1 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0">
                   <svg
                     className="w-10/12 text-blue-800 dark:text-blue-300"
                     aria-hidden="true"
@@ -30,7 +30,7 @@ export default function CompanyInfo2() {
             </li>
             <li className="relative mb-6 sm:mb-0 ">
               <div className="flex items-center">
-                <div className=" z-10 flex items-center justify-center w-6 h-6 bg-teal-500 rounded-full ring-1 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0">
+                <div className="z-10 flex items-center justify-center w-6 h-6 bg-teal-500 rounded-full ring-1 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0">
                   <svg
                     className="w-10/12 text-blue-800 dark:text-blue-300 ring-1 ring-offset-1 ring-teal-500 rounded-full"
                     aria-hidden="true"
