@@ -34,10 +34,8 @@ import ForgotPassword from './pages/Auth/ForgotPassword';
 import InfoSuccess from './pages/Auth/InfoSuccess';
 import ResetPassword from './pages/Auth/ResetPassword';
 import SuccessReset from './pages/Auth/SuccessReset';
-import CompanyInfo1 from './pages/Auth/CompanyInfo1';
-import CompanyInfo2 from './pages/Auth/CompanyInfo2';
-import CompanyInfo3 from './pages/Auth/CompanyInfo3';
-import CompanyInfo4 from './pages/Auth/CompanyInfo4';
+import CompanyInfo from './pages/Auth/CompanyInfo';
+import PersistLogin from './components/Auth/PersistLogin';
 
 const router = createBrowserRouter([
   {
@@ -56,38 +54,9 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: '/company-info-i',
-    element: <CompanyInfo1 />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/company-info-ii',
-    element: <CompanyInfo2 />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/company-info-iii',
-    element: <CompanyInfo3 />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/company-info-iv',
-    element: <CompanyInfo4 />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/lounge',
-    element: <Lounge />,
-  },
-  {
     element: <AccountHeader />,
     errorElement: <ErrorPage />,
-
     children: [
-      // {
-      //   index: true, // This is for /account/
-      //   element: <Navigate to="/account/sign-in" />,
-      // },
       {
         path: 'sign-up',
         element: <SignUp />,
@@ -115,88 +84,93 @@ const router = createBrowserRouter([
     ],
   },
   {
-    element: <DashboardLayout />,
+    element: <PersistLogin />,
     errorElement: <ErrorPage />,
     children: [
       {
-        path: 'main',
-        element: <Statistics />,
-      },
-      {
-        path: 'main/total-carbon-emission',
-        element: <TotalCarbonEmission />,
-      },
-      {
-        path: 'main/employee-carbon',
-        element: <EmployeeFootprint />,
-      },
-      {
-        path: 'main/offset',
-        element: <CarbonOffset />,
-      },
-      {
-        path: 'main/change-in-emission',
-        element: <ChangeInEmission />,
-      },
-      {
-        path: 'scope-i',
-        element: <ScopeI />,
-      },
-      {
-        path: 'scope-i/stationary-combustion',
-        element: <ReportStationaryCombustion />,
-      },
-      {
-        path: 'scope-i/mobile-combustion',
-        element: <ReportMobileCombustion />,
-      },
-      {
-        path: 'scope-i/fugitive-emission',
-        element: <ReportFugitiveEmission />,
-      },
-      {
-        path: 'scope-ii',
-        element: <ScopeII />,
-      },
-      {
-        path: 'scope-ii/energy-purchase',
-        element: <ReportEnergyPurchase />,
-      },
-      {
-        path: 'scope-ii/electric-vehicle',
-        element: <ReportElectricVehicle />,
-      },
-      {
-        path: 'scope-iii',
-        element: <ScopeIII />,
-      },
-      {
-        path: 'scope-iii/business-travel',
-        element: <ReportBusinessTravel />,
-      },
-      {
-        path: 'scope-iii/employee-commuting',
-        element: <ReportEmployeeCommuting />,
-      },
-      {
-        path: 'feedback',
-        element: <Feedback />,
-      },
-      {
-        path: 'settings',
-        element: <Settings />,
-      },
-      {
-        path: 'subscription',
-        element: <Subscription />,
-      },
-      {
-        path: 'userlist',
-        element: <UsersList />,
-      },
-      {
-        path: 'help',
-        element: <Help />,
+        element: <DashboardLayout />,
+        children: [
+          {
+            path: 'main',
+            element: <Statistics />,
+          },
+          {
+            path: 'main/total-carbon-emission',
+            element: <TotalCarbonEmission />,
+          },
+          {
+            path: 'main/employee-carbon',
+            element: <EmployeeFootprint />,
+          },
+          {
+            path: 'main/offset',
+            element: <CarbonOffset />,
+          },
+          {
+            path: 'main/change-in-emission',
+            element: <ChangeInEmission />,
+          },
+          {
+            path: 'scope-i',
+            element: <ScopeI />,
+          },
+          {
+            path: 'scope-i/stationary-combustion',
+            element: <ReportStationaryCombustion />,
+          },
+          {
+            path: 'scope-i/mobile-combustion',
+            element: <ReportMobileCombustion />,
+          },
+          {
+            path: 'scope-i/fugitive-emission',
+            element: <ReportFugitiveEmission />,
+          },
+          {
+            path: 'scope-ii',
+            element: <ScopeII />,
+          },
+          {
+            path: 'scope-ii/energy-purchase',
+            element: <ReportEnergyPurchase />,
+          },
+          {
+            path: 'scope-ii/electric-vehicle',
+            element: <ReportElectricVehicle />,
+          },
+          {
+            path: 'scope-iii',
+            element: <ScopeIII />,
+          },
+          {
+            path: 'scope-iii/business-travel',
+            element: <ReportBusinessTravel />,
+          },
+          {
+            path: 'scope-iii/employee-commuting',
+            element: <ReportEmployeeCommuting />,
+          },
+          {
+            path: 'feedback',
+            element: <Feedback />,
+          },
+          {
+            path: 'settings',
+            element: <Settings />,
+          },
+          {
+            path: 'subscription',
+            element: <Subscription />,
+          },
+          {
+            path: 'userlist',
+            element: <UsersList />,
+          },
+          {
+            path: 'help',
+            element: <Help />,
+          },
+        ],
       },
     ],
   },

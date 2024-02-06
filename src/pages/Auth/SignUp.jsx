@@ -3,7 +3,7 @@ import { HiEye, HiX } from 'react-icons/hi';
 import { IoIosInformationCircle } from 'react-icons/io';
 import { useNavigate, useLocation } from 'react-router-dom';
 import terms from '../../components/Auth/terms-and-conditions.json';
-import customAxios from '../../api/axios';
+import { publicAxios } from '../../api/axios';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -57,16 +57,11 @@ const SignUp = () => {
     }
 
     try {
-      const response = await customAxios.post(
-        '/api/v1/auth/register',
-        JSON.stringify(values),
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
+      const response = await publicAxios.post(
+        '/auth/register',
+        JSON.stringify(values)
       );
-      // console.log(response.data);
+      console.log(response.data);
       // Navigate on successful registration
       navigate('/info-success', { state: { from: location }, replace: true });
     } catch (err) {

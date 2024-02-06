@@ -1,8 +1,41 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import {
+  HomeNavbar,
+  Home,
+  About,
+  FeaturesSection,
+  TestimonialsSection,
+  ContactSection,
+} from '../components/Home';
 
 const HomePage = () => {
+  const pageVariants = {
+    hidden: {
+      opacity: 0,
+      x: '-100vw',
+    },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        type: 'spring',
+        stiffness: 50,
+      },
+    },
+  };
+
   return (
-    <div className="text-3xl text-bold to-blue-300">This is the HomePage</div>
+    <div className="font-bold">
+      <HomeNavbar />
+      <motion.div initial="hidden" animate="visible" variants={pageVariants}>
+        <Home />
+        <About />
+        <FeaturesSection />
+        <TestimonialsSection />
+        <ContactSection />
+      </motion.div>
+    </div>
   );
 };
 

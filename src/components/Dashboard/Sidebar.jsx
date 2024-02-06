@@ -29,11 +29,11 @@ const navLinks = [
   // },
   { name: 'Settings', to: '/settings', icon: <GoGear /> },
   { name: 'Help', to: '/help', icon: <IoIosHelpCircleOutline /> },
-  { name: 'Sign out', to: '/sign-out', icon: <RiLogoutBoxLine /> },
+  // { name: 'Sign out', to: '/sign-out', icon: <RiLogoutBoxLine /> },
   // ... add other links as needed
 ];
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose, disable }) => {
   const sidebarRef = useRef();
 
   const { theme, toggleTheme } = useTheme();
@@ -70,6 +70,9 @@ const Sidebar = ({ isOpen, onClose }) => {
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isOpen, onClose]);
 
+  const linkClassName = (baseClasses) =>
+    `${baseClasses} ${disable ? 'pointer-events-none opacity-50' : ''}`;
+
   return (
     <aside
       ref={sidebarRef}
@@ -90,6 +93,8 @@ const Sidebar = ({ isOpen, onClose }) => {
             to={link.to}
             icon={link.icon}
             name={link.name}
+            className={linkClassName('')}
+            onClick={(e) => disable && e.preventDefault()}
           />
         ))}
       </nav>

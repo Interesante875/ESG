@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation, NavLink } from 'react-router-dom';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
-import customAxios from '../../api/axios';
+import { publicAxios } from '../../api/axios';
 import { FaAngleLeft } from 'react-icons/fa';
 
 export default function ResetPassword() {
@@ -16,12 +16,8 @@ export default function ResetPassword() {
 
   // Validate token on component mount
   useEffect(() => {
-    customAxios
-      .get(`/api/v1/auth/validate-reset-token/${token}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+    publicAxios
+      .get(`/auth/validate-reset-token/${token}`)
       .then((response) => {
         // Assuming the API sends back a specific message or status code when the token is valid
         if (response.status === 200) {
@@ -82,22 +78,14 @@ export default function ResetPassword() {
     if (submitDisabled) return; // Early return if form is not valid
 
     try {
-      const response = await customAxios.post(
-        '/api/v1/auth/reset-password',
-        {
-          token,
-          password: values.password,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await publicAxios.post('/auth/reset-password', {
+        token,
+        password: values.password,
+      });
 
       // Check if the API might send a specific response for successful password reset
       if (response.status === 200) {
-        navigate('/reset-password-success', { replace: true });
+        navigate('/success-reset', { replace: true });
       } else {
         // Handle unexpected successful response codes other than 200, if necessary
         setError(

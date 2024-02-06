@@ -1,18 +1,20 @@
-import { useState, useEffect } from 'react'
-import { IoMdCheckmark } from 'react-icons/io'
-import { FaRegEdit } from 'react-icons/fa'
+import { useState, useEffect } from 'react';
+import { IoMdCheckmark } from 'react-icons/io';
+import { FaRegEdit } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import StepProgress from '../../components/Form/StepProgress';
 
-export default function CompanyInfo1() {
+export default function CompanyInfo() {
   useEffect(() => {
-    window.addEventListener('beforeunload', alertUser)
+    window.addEventListener('beforeunload', alertUser);
     return () => {
-      window.removeEventListener('beforeunload', alertUser)
-    }
-  }, [])
+      window.removeEventListener('beforeunload', alertUser);
+    };
+  }, []);
   const alertUser = (e) => {
-    e.preventDefault()
-    e.returnValue = ''
-  }
+    e.preventDefault();
+    e.returnValue = '';
+  };
 
   const [disabledinputs, setDisabledInputs] = useState({
     companyname: true,
@@ -20,7 +22,7 @@ export default function CompanyInfo1() {
     address: true,
     contact: true,
     standard: true,
-  })
+  });
 
   //The variables from the user input will be saved in this variable
   const [values, setValues] = useState({
@@ -36,13 +38,13 @@ export default function CompanyInfo1() {
     category: '',
     contact: '',
     ssm: '',
-  })
+  });
 
   useEffect(() => {
     setValues({
       ...values,
-      ['fulladdress']: `${values.address1}, ${values.address2}, ${values.city}, ${values.state}, ${values.postal}, ${values.country}`,
-    })
+      fulladdress: `${values.address1}, ${values.address2}, ${values.city}, ${values.state}, ${values.postal}, ${values.country}`,
+    });
   }, [
     values.address1,
     values.address2,
@@ -50,12 +52,12 @@ export default function CompanyInfo1() {
     values.state,
     values.postal,
     values.country,
-  ])
+  ]);
 
-  const [pageNumber, setPageNumber] = useState(1)
+  const [pageNumber, setPageNumber] = useState(1);
 
   //To show the error message to the user for a invalid email input
-  const [error, setError] = useState([])
+  const [error, setError] = useState([]);
 
   // const navigate = useNavigate()  //To navigate to other page
 
@@ -64,7 +66,7 @@ export default function CompanyInfo1() {
    * @param {*} e
    */
   function handleChange(e) {
-    setValues({ ...values, [e.target.name]: e.target.value })
+    setValues({ ...values, [e.target.name]: e.target.value });
   }
 
   /**
@@ -72,200 +74,20 @@ export default function CompanyInfo1() {
    * @param {*} e
    */
   function handleSubmit(e) {
-    e.preventDefault()
+    e.preventDefault();
   }
 
   function handleClick(name) {
     setDisabledInputs((prevState) => ({
       ...prevState,
       [name]: !disabledinputs[name],
-    }))
+    }));
   }
 
   return (
     <div>
       <div className="lg:px-60 md:px-12 pt-7 flex flex-col justify-center items-center gap-6 overflow-y-auto overflow-x-hidden">
-        <div className="flex justify-center items-center">
-          <ol className="md:ml-10 lg:ml-8 w-full sm:flex">
-            <li className="relative mb-6 sm:mb-0 ">
-              <div className="flex items-center">
-                <div className="z-10 flex items-center justify-center w-6 h-6 bg-teal-500 rounded-full ring-1 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0">
-                  <svg
-                    className={() => {
-                      if (pageNumber === 1) {
-                        return 'w-10/12 text-blue-800 dark:text-blue-300 ring-1 ring-offset-1 ring-teal-500 rounded-full'
-                      } else {
-                        return 'w-10/12 text-blue-800 dark:text-blue-300'
-                      }
-                    }}
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    {pageNumber !== 1 ? (
-                      <IoMdCheckmark size={20} color="white" />
-                    ) : null}
-                  </svg>
-                </div>
-                <div
-                  className={
-                    pageNumber === 1
-                      ? 'hidden sm:flex md:w-[150px] lg:w-[200px] bg-gray-200 h-0.5 dark:bg-gray-700'
-                      : 'hidden sm:flex md:w-[150px] lg:w-[200px] bg-teal-500 h-0.5 dark:bg-gray-700'
-                  }
-                ></div>
-              </div>
-              <div className="mt-3 sm:pe-8">
-                <h3
-                  className={
-                    pageNumber === 1
-                      ? 'text-teal-500 dark:text-white'
-                      : 'text-gray-300 dark:text-white'
-                  }
-                >
-                  Step 1
-                </h3>
-                <p className="text-base font-semibold dark:text-gray-400">
-                  Company Details
-                </p>
-              </div>
-            </li>
-            <li className="mb-6 sm:mb-0 ">
-              <div className="flex items-center">
-                <div
-                  className={
-                    pageNumber < 2
-                      ? 'z-10 flex items-center justify-center w-6 h-6 bg-gray-200 rounded-full ring-1 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0'
-                      : 'z-10 flex items-center justify-center w-6 h-6 bg-teal-500 rounded-full ring-1 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0'
-                  }
-                >
-                  <svg
-                    className={
-                      pageNumber === 2
-                        ? 'w-10/12 text-blue-800 dark:text-blue-300 ring-1 ring-offset-1 ring-teal-500 rounded-full'
-                        : 'w-10/12 h-10/12 text-blue-800 dark:text-blue-300'
-                    }
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    {pageNumber > 2 ? (
-                      <IoMdCheckmark size={20} color="white" />
-                    ) : null}
-                  </svg>
-                </div>
-                <div
-                  className={
-                    pageNumber <= 2
-                      ? 'hidden sm:flex md:w-[150px] lg:w-[200px] bg-gray-200 h-0.5 dark:bg-gray-700'
-                      : 'hidden sm:flex md:w-[150px] lg:w-[200px] bg-teal-500 h-0.5 dark:bg-gray-700'
-                  }
-                ></div>
-              </div>
-              <div className="mt-3 sm:pe-8">
-                <h3
-                  className={
-                    pageNumber === 2
-                      ? 'text-teal-500 dark:text-white'
-                      : 'text-gray-300 dark:text-white'
-                  }
-                >
-                  Step 2
-                </h3>
-                <p className="text-base font-semibold dark:text-gray-400">
-                  Certification and Data
-                </p>
-              </div>
-            </li>
-            <li className="relative mb-6 sm:mb-0">
-              <div className="flex items-center">
-                <div
-                  className={
-                    pageNumber < 3
-                      ? 'z-10 flex items-center justify-center w-6 h-6 bg-gray-200 rounded-full ring-1 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0'
-                      : 'z-10 flex items-center justify-center w-6 h-6 bg-teal-500 rounded-full ring-1 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0'
-                  }
-                >
-                  <svg
-                    className={
-                      pageNumber === 3
-                        ? 'w-10/12 text-blue-800 dark:text-blue-300 ring-1 ring-offset-1 ring-teal-500 rounded-full'
-                        : 'w-10/12 h-10/12 text-blue-800 dark:text-blue-300'
-                    }
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    {pageNumber > 3 ? (
-                      <IoMdCheckmark size={20} color="white" />
-                    ) : null}
-                  </svg>
-                </div>
-                <div
-                  className={
-                    pageNumber <= 3
-                      ? 'hidden sm:flex md:w-[150px] lg:w-[200px] bg-gray-200 h-0.5 dark:bg-gray-700'
-                      : 'hidden sm:flex md:w-[150px] lg:w-[200px] bg-teal-500 h-0.5 dark:bg-gray-700'
-                  }
-                ></div>
-              </div>
-              <div className="mt-3 sm:pe-8">
-                <h3
-                  className={
-                    pageNumber === 3
-                      ? 'text-teal-500 dark:text-white'
-                      : 'text-gray-300 dark:text-white'
-                  }
-                >
-                  Step 3
-                </h3>
-                <p className="text-base font-semibold dark:text-gray-400">
-                  Market Registration
-                </p>
-              </div>
-            </li>
-            <li className="relative mb-6 sm:mb-0">
-              <div className="flex items-center">
-                <div
-                  className={
-                    pageNumber < 4
-                      ? 'z-10 flex items-center justify-center w-6 h-6 bg-gray-200 rounded-full ring-1 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0'
-                      : 'z-10 flex items-center justify-center w-6 h-6 bg-teal-500 rounded-full ring-1 ring-white dark:bg-blue-900 sm:ring-8 dark:ring-gray-900 shrink-0'
-                  }
-                >
-                  <svg
-                    className={
-                      pageNumber === 4
-                        ? 'w-10/12 text-blue-800 dark:text-blue-300 ring-1 ring-offset-1 ring-teal-500 rounded-full'
-                        : 'w-10/12 h-10/12 text-blue-800 dark:text-blue-300'
-                    }
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  ></svg>
-                </div>
-              </div>
-              <div className="mt-3 sm:pe-8">
-                <h3
-                  className={
-                    pageNumber === 4
-                      ? 'text-teal-500 dark:text-white'
-                      : 'text-gray-300 dark:text-white'
-                  }
-                >
-                  Step 4
-                </h3>
-                <p className="text-base font-semibold dark:text-gray-400">
-                  Summary
-                </p>
-              </div>
-            </li>
-          </ol>
-        </div>
+        <StepProgress pageNumber={pageNumber} />
         {(() => {
           if (pageNumber === 1) {
             return (
@@ -279,7 +101,7 @@ export default function CompanyInfo1() {
                 <form className="w-10/12" onSubmit={handleSubmit}>
                   <div className="mb-10">
                     <label
-                      for="name"
+                      htmlFor="name"
                       className="block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
                     >
                       Company Name<span className="text-red-600"> *</span>
@@ -300,7 +122,7 @@ export default function CompanyInfo1() {
                   </div>
                   <div className="mb-10">
                     <label
-                      for="regnumber"
+                      htmlFor="regnumber"
                       className="block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
                     >
                       Company Registration Number
@@ -322,7 +144,7 @@ export default function CompanyInfo1() {
                   </div>
                   <div className="mb-10">
                     <label
-                      for="address"
+                      htmlFor="address"
                       className="block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
                     >
                       Company Address<span className="text-red-600"> *</span>
@@ -391,7 +213,7 @@ export default function CompanyInfo1() {
                   </div>
                   <div className="mb-10">
                     <label
-                      for="name"
+                      htmlFor="name"
                       className="block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
                     >
                       Company Category<span className="text-red-600"> *</span>
@@ -405,8 +227,8 @@ export default function CompanyInfo1() {
                       className="font-['Inter'] invalid:text-gray-500 border border-zinc-300 rounded-md focus:ring-teal-600 focus:border-teal-600 block w-full p-3 dark:bg-white-700 dark:border-white-600 dark:placeholder-white-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       required
                     >
-                      <option value=" " hidden selected>
-                        Select Tariff Category Here
+                      <option value=" " hidden>
+                        Select Company Category Here
                       </option>
                       <option value="education">Education</option>
                       <option value="healthcare">Healthcare</option>
@@ -414,6 +236,34 @@ export default function CompanyInfo1() {
                       <option value="retail">Retail</option>
                       <option value="oil">Oil & Gas</option>
                       <option value="manufacturing">Manufacturing</option>
+                      <option value="technology">Technology</option>
+                      <option value="entertainment">Entertainment</option>
+                      <option value="food">Food and Beverage</option>
+                      <option value="realestate">Real Estate</option>
+                      <option value="automotive">Automotive</option>
+                      <option value="travel">Travel and Tourism</option>
+                      <option value="hospitality">Hospitality</option>
+                      <option value="agriculture">Agriculture</option>
+                      <option value="nonprofit">
+                        Non-Profit Organizations
+                      </option>
+                      <option value="sports">Sports and Recreation</option>
+                      <option value="fashion">Fashion and Apparel</option>
+                      <option value="telecommunications">
+                        Telecommunications
+                      </option>
+                      <option value="energy">Energy and Utilities</option>
+                      <option value="pharmaceuticals">Pharmaceuticals</option>
+                      <option value="construction">Construction</option>
+                      <option value="transportation">Transportation</option>
+                      <option value="ecommerce">E-commerce</option>
+                      <option value="media">Media and Publishing</option>
+                      <option value="government">
+                        Government and Public Services
+                      </option>
+                      <option value="environmental">
+                        Environmental Services
+                      </option>
                     </select>
                     {error.category && (
                       <p className=" text-red-500 font-['Inter] text-xs font-normal flex">
@@ -423,7 +273,7 @@ export default function CompanyInfo1() {
                   </div>
                   <div className="mb-12">
                     <label
-                      for="contact"
+                      htmlFor="contact"
                       className="mb-2 text-base font-extrabold flex font-['Inter'] text-white-900 dark:text-white"
                     >
                       Contact Number
@@ -464,7 +314,7 @@ export default function CompanyInfo1() {
                   </div>
                 </form>
               </>
-            )
+            );
           } else if (pageNumber === 2) {
             return (
               <>
@@ -480,12 +330,12 @@ export default function CompanyInfo1() {
                       SSM Certificate<span className="text-red-600"> *</span>
                     </p>
                     <label
-                      for="cert"
+                      htmlFor="cert"
                       className="flex flex-col items-center justify-center w-full h-28 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
                     >
                       <div class="flex flex-col items-center justify-center pt-5 pb-6">
                         <svg
-                          class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                          className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
                           aria-hidden="true"
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
@@ -495,7 +345,7 @@ export default function CompanyInfo1() {
                             stroke="currentColor"
                             stroke-linecap="round"
                             stroke-linejoin="round"
-                            stroke-width="2"
+                            strokeWidth="2"
                             d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
                           />
                         </svg>
@@ -530,7 +380,7 @@ export default function CompanyInfo1() {
                   </div>
                 </form>
               </>
-            )
+            );
           } else if (pageNumber === 3) {
             return (
               <>
@@ -561,7 +411,7 @@ export default function CompanyInfo1() {
                   </div>
                 </div>
               </>
-            )
+            );
           } else {
             return (
               <>
@@ -573,9 +423,9 @@ export default function CompanyInfo1() {
                 </div>
                 <form className="w-10/12">
                   <div className="mb-10">
-                    <div className="flex grid grid-cols-3 gap-1 ">
+                    <div className="grid grid-cols-3 gap-1 ">
                       <label
-                        for="companyname"
+                        htmlFor="companyname"
                         className=" col-span-2 block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
                       >
                         Company Name
@@ -602,9 +452,9 @@ export default function CompanyInfo1() {
                     ></input>
                   </div>
                   <div className="mb-10">
-                    <div className="flex grid grid-cols-3 gap-1 ">
+                    <div className="grid grid-cols-3 gap-1 ">
                       <label
-                        for="regnumber"
+                        htmlFor="regnumber"
                         className="col-span-2 block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
                       >
                         Company Registration Number
@@ -631,9 +481,9 @@ export default function CompanyInfo1() {
                   </div>
 
                   <div className="mb-10">
-                    <div className="flex grid grid-cols-3 gap-1 ">
+                    <div className="grid grid-cols-3 gap-1 ">
                       <label
-                        for="address"
+                        htmlFor="address"
                         className="col-span-2 block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
                       >
                         Company Address
@@ -660,9 +510,9 @@ export default function CompanyInfo1() {
                   </div>
 
                   <div className="mb-10">
-                    <div className="flex grid grid-cols-3 gap-1 ">
+                    <div className="grid grid-cols-3 gap-1 ">
                       <label
-                        for="contact"
+                        htmlFor="contact"
                         className="col-span-2 block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
                       >
                         Company PIC Contact
@@ -689,10 +539,10 @@ export default function CompanyInfo1() {
                   </div>
 
                   <div className="mb-12">
-                    <div className="flex grid grid-cols-3 gap-1 ">
+                    <div className="grid grid-cols-3 gap-1 ">
                       <label
-                        for="standard"
-                        className="col-span-2 block mb-2 text-base font-extrabold flex font-['Inter'] text-white-900 dark:text-white"
+                        htmlFor="standard"
+                        className="col-span-2 block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
                       >
                         SSM Certificate
                       </label>
@@ -705,10 +555,10 @@ export default function CompanyInfo1() {
                   </div>
 
                   <div className="mb-12">
-                    <div className="flex grid grid-cols-3 gap-1 ">
+                    <div className="grid grid-cols-3 gap-1 ">
                       <label
-                        for="standard"
-                        className="col-span-2 block mb-2 text-base font-extrabold flex font-['Inter'] text-white-900 dark:text-white"
+                        htmlFor="standard"
+                        className="col-span-2 mb-2 text-base font-extrabold flex font-['Inter'] text-white-900 dark:text-white"
                       >
                         ESG Standard
                       </label>
@@ -737,9 +587,9 @@ export default function CompanyInfo1() {
                   </div>
 
                   {/* <div className="inline-flex flex-row mb-12"> */}
-                  <div className="flex font-['Inter'] grid grid-cols-3 gap-1 mb-12">
+                  <div className="font-['Inter'] grid grid-cols-3 gap-1 mb-12">
                     <div className="col-span-2 flex items-center justify-start">
-                      <button className="text-sm justify-center items-center h-12 px-10 py-2.5 rounded-md border border-teal-600 text-center text-teal-600 text-sm font-semibold font-['Inter'] hover:border-teal-800 hover:text-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-500 dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800">
+                      <button className="text-sm justify-center items-center h-12 px-10 py-2.5 rounded-md border border-teal-600 text-center text-teal-600 font-semibold font-['Inter'] hover:border-teal-800 hover:text-teal-800 focus:ring-2 focus:outline-none focus:ring-teal-500 dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800">
                         Back
                       </button>
                     </div>
@@ -754,10 +604,10 @@ export default function CompanyInfo1() {
                   </div>
                 </form>
               </>
-            )
+            );
           }
         })()}
       </div>
     </div>
-  )
+  );
 }

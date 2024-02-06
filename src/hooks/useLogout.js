@@ -1,4 +1,4 @@
-import customAxios from '../api/axios';
+import { publicAxios } from '../api/axios';
 import useAuth from './useAuth';
 
 const useLogout = () => {
@@ -7,11 +7,8 @@ const useLogout = () => {
   const logout = async () => {
     setAuth({});
     try {
-      const response = await customAxios.post('/api/v1/auth/logout', {
+      const response = await publicAxios.get('/auth/logout', {
         withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
     } catch (err) {
       console.error(err);

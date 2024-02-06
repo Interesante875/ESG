@@ -18,7 +18,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 flex flex-col bg-slate-400 dark:bg-stone-800 text-black dark:text-white md:p-10 w-full overflow-y-auto h-full">
+    <div className="mx-auto p-4 flex flex-col bg-slate-400 dark:bg-stone-800 text-black dark:text-white md:p-10 w-full overflow-y-auto h-full">
       <h1 className="text-3xl font-bold mb-8 text-center md:text-left">
         User Settings
       </h1>

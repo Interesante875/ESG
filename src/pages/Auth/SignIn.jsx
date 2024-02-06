@@ -2,10 +2,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import useAuth from '../../hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { HiEye } from 'react-icons/hi';
-import axios from '../../api/axios';
+import { publicAxios } from '../../api/axios';
 
 const SignIn = () => {
-  const { setAuth } = useAuth();
+  const { setAuth, persist, setPersist } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,7 +40,10 @@ const SignIn = () => {
     setError({});
 
     try {
-      const response = await axios.post('/api/v1/auth/login', values); // Adjust API endpoint as needed
+      const response = await publicAxios.post('/auth/login', values, {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      }); // Adjust API endpoint as needed
       const accessToken = response?.data?.accessToken;
       const username = response?.data?.username;
       const companyName = response?.data?.companyName;
@@ -94,6 +97,14 @@ const SignIn = () => {
     }
   }
 
+  const togglePersist = () => {
+    setPersist(true);
+  };
+
+  useEffect(() => {
+    localStorage.setItem('persist', persist);
+  }, [persist]);
+
   return (
     <div className="max-h-screen bg-slate-50 container">
       <div className=" h-screen flex-col flex justify-center items-start pl-32 pr-24 py-32">
@@ -112,7 +123,7 @@ const SignIn = () => {
           <div className="mb-5">
             <label
               htmlFor="email"
-              className="block mb-2 text-base font-extrabold font-['Inter'] text-white-900 dark:text-white"
+              className="block mb-2 text-base font-extrabold text-black"
             >
               Email Address <span className="text-red-600">*</span>
             </label>
@@ -123,7 +134,7 @@ const SignIn = () => {
                 id="email"
                 value={values.email}
                 onChange={handleChange}
-                className="font-['Inter'] bg-white-50 border-2 border-red-500 text-white-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-white-700 dark:border-white-600 dark:placeholder-white-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:outline-none focus:border-red-500 focus:border-2"
+                className="bg-white-50 border-2 border-red-500 text-black text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-white-700 dark:border-white-600 dark:placeholder-white-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 focus:outline-none focus:border-red-500 focus:border-2"
               ></input>
             ) : (
               <input
@@ -132,7 +143,7 @@ const SignIn = () => {
                 value={values.email}
                 id="email"
                 onChange={handleChange}
-                className="font-['Inter'] bg-white-50 border border-zinc-300 text-white-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-white-700 dark:border-white-600 dark:placeholder-white-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className=" bg-white-50 border border-zinc-300 text-white-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-white-700 dark:border-white-600 dark:placeholder-white-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               ></input>
             )}
             {error.email && (
@@ -144,7 +155,7 @@ const SignIn = () => {
           <div className="mb-5">
             <label
               htmlor="password"
-              className="mb-2 text-base font-extrabold flex font-['Inter'] text-white-900 dark:text-white"
+              className="mb-2 text-base font-extrabold flex text-white-900"
             >
               Password <span className="ml-1 text-red-600 flex">*</span>
             </label>
@@ -165,7 +176,7 @@ const SignIn = () => {
                   value={values.password}
                   id="password"
                   onChange={handleChange}
-                  className="bg-white-50 border border-zinc-300 text-white-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-white-700 dark:border-white-600 dark:placeholder-white-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="bg-white-50 border border-zinc-300 text-black text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-white-700 dark:border-white-600 dark:placeholder-white-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 ></input>
               )}
               <span
@@ -179,12 +190,12 @@ const SignIn = () => {
             </div>
 
             {error.password && (
-              <p className=" text-red-500 font-['Inter] text-xs font-normal flex">
+              <p className=" text-red-500 text-xs font-normal flex">
                 {error.password}
               </p>
             )}
           </div>
-          <div className="font-['Inter'] grid grid-cols-3 gap-1">
+          <div className=" grid grid-cols-3 gap-1">
             <div className="col-span-2 flex items-center justify-start">
               <input
                 id="link-checkbox"
@@ -192,10 +203,11 @@ const SignIn = () => {
                 value=""
                 className=" w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 required
+                onChange={togglePersist}
               ></input>
               <label
                 htmlFor="link-checkbox"
-                className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                className="ms-2 text-sm font-medium text-gray-900"
               >
                 Remember me
               </label>

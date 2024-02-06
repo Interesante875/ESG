@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaAngleLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import customAxios from '../../api/axios'; // Ensure this path matches your project structure
+import { publicAxios } from '../../api/axios'; // Ensure this path matches your project structure
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -26,12 +26,9 @@ export default function ForgotPassword() {
     }
 
     try {
-      await customAxios.post(
-        '/api/v1/auth/request-password-reset',
-        JSON.stringify({ email: email }),
-        {
-          headers: { 'Content-Type': 'application/json' },
-        }
+      await publicAxios.post(
+        '/auth/request-password-reset',
+        JSON.stringify({ email: email })
       );
       navigate('/info-success', { replace: true });
     } catch (err) {

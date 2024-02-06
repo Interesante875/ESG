@@ -4,6 +4,7 @@ import App from './App';
 import './index.css';
 import { AuthProvider } from './contexts/AuthProvider';
 import { disableReactDevTools } from '@fvilers/disable-react-devtools';
+import PersistLogin from './components/Auth/PersistLogin';
 
 disableReactDevTools();
 

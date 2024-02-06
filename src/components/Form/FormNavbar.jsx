@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FiMenu, FiSettings, FiLogOut, FiCreditCard } from 'react-icons/fi';
+import { FiLogOut } from 'react-icons/fi';
 import { NavLink, useNavigate } from 'react-router-dom';
 import useLogout from '../../hooks/useLogout';
 
-const Navbar = ({ onMenuClick, profileName, profileIcon, disable }) => {
+const FormNavbar = ({ profileName, profileIcon }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -28,21 +28,12 @@ const Navbar = ({ onMenuClick, profileName, profileIcon, disable }) => {
     closeDropdown(); // Ensure the dropdown is closed upon logout
     // Logout logic goes here (e.g., clear auth token, update state, redirect)
     await logout();
-    navigate('/sign-out'); // Redirect to sign-in page
+    navigate('/sign-in'); // Redirect to sign-in page
   };
-
-  const linkClassName = (baseClasses) =>
-    `${baseClasses} ${disable ? 'pointer-events-none opacity-50' : ''}`;
 
   return (
     <nav className="sticky bg-slate-300 dark:bg-slate-700 shadow-md h-16 flex items-center justify-between px-4 lg:px-8 top-0 w-full z-10 py-2">
       <div className="flex items-center">
-        <button
-          onClick={onMenuClick}
-          className="text-gray-700 dark:text-amber-200 lg:hidden"
-        >
-          <FiMenu size={24} />
-        </button>
         <NavLink
           to="/home"
           className="hidden lg:block text-xl text-blue-900 dark:text-white font-semibold"
@@ -88,25 +79,6 @@ const Navbar = ({ onMenuClick, profileName, profileIcon, disable }) => {
         {dropdownOpen && (
           <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl z-20">
             <NavLink
-              to="/settings"
-              className={linkClassName(
-                'block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white'
-              )}
-              onClick={(e) => {
-                disable && e.preventDefault();
-                closeDropdown();
-              }}
-            >
-              <FiSettings className="inline mr-2" /> Settings
-            </NavLink>
-            {/* <NavLink
-              to="/subscription"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
-              onClick={closeDropdown}
-            >
-              <FiCreditCard className="inline mr-2" /> Subscription
-            </NavLink> */}
-            <NavLink
               to="/sign-out"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
               onClick={handleLogout}
@@ -120,4 +92,4 @@ const Navbar = ({ onMenuClick, profileName, profileIcon, disable }) => {
   );
 };
 
-export default Navbar;
+export default FormNavbar;
