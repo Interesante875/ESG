@@ -1,28 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import SearchBar from '../../components/Help/Searchbar';
 import Fuse from 'fuse.js';
-import {
-  FiChevronLeft,
-  FiChevronRight,
-  FiEye,
-  FiEyeOff,
-  FiPlus,
-  FiPlusCircle,
-  FiTrash,
-} from 'react-icons/fi';
-import { FaChessKing } from 'react-icons/fa';
+import { FiEye, FiEyeOff, FiPlus, FiTrash } from 'react-icons/fi';
 
-import UserItem from '../../components/Dashboard/UserItem';
-import UserModal from '../../components/Dashboard/UserModal';
 import usersData from '../../fake_data/MOCK_DATA_User_List_2.json';
 import { columnDefinitionUsers } from '../../components/Table/column';
 import { TableUserList } from '../../components/Table';
 
+import { useLocation, useNavigate } from 'react-router-dom';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
+import axios from 'axios';
+import useAuth from '../../hooks/useAuth';
+
 const UsersList = () => {
   const column = columnDefinitionUsers;
-  const companyName = 'TranXEnergy Inc';
+
+  const { auth } = useAuth();
+  const companyName = auth.companyName;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const axiosPrivate = useAxiosPrivate();
 
   const [data, setData] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showContentModal, setShowContentModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -41,37 +40,61 @@ const UsersList = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Initialize Fuse with the list of users and the options for fuzzy search
-  const fuse = new Fuse(usersData, {
-    keys: ['username', 'name', 'email', 'userRole'],
-    includeScore: true,
-  });
-
-  // Filter data based on search term
   useEffect(() => {
-    if (searchTerm.trim().length > 0) {
-      const results = fuse.search(searchTerm).map((result) => result.item);
-      setData(results);
-    } else {
-      setData(usersData); // Reset to original data if search term is cleared
-    }
-  }, [searchTerm]);
+    let isMounted = true;
+    const controller = new AbortController();
 
-  useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // const response = await axios.get('your-api-endpoint'); // Replace with your API endpoint
-        // setData(response.data);
-        setData(usersData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
+        const response = await axiosPrivate.get('/user/get-users', {
+          signal: controller.signal,
+        });
+
+        if (isMounted) {
+          setData(response.data);
+          setSearchResults(response.data);
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          // Log for debugging purposes
+          // console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Request failed:', err);
+          // Only navigate if the error was not a cancellation
+          // Check for a 403 status code specifically
+          if (err.response && err.response.status === 403) {
+            navigate('/sign-in', { state: { from: location }, replace: true });
+          }
+        }
       }
       setIsLoading(false);
     };
 
     fetchData();
-  }, []);
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      // console.log('Cleanup: Cancelled any ongoing requests.');
+    };
+  }, [navigate, location, axiosPrivate]);
+
+  // Filter data based on search term
+  useEffect(() => {
+    // Initialize Fuse with the list of users and the options for fuzzy search
+    const fuse = new Fuse(data, {
+      keys: ['username', 'name', 'email', 'userRole'],
+      includeScore: true,
+    });
+
+    if (searchTerm.trim().length > 0) {
+      const results = fuse.search(searchTerm).map((result) => result.item);
+      setSearchResults(results);
+    } else {
+      setSearchResults(data); // Reset to original data if search term is cleared
+    }
+  }, [searchTerm, data]);
 
   const handleAddNewClick = () => {
     setEditableData({
@@ -98,19 +121,114 @@ const UsersList = () => {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (rowToDelete !== null) {
-      setData(data.filter((row) => row.id !== rowToDelete));
-      setRowToDelete(null);
+      let isMounted = true;
+      const controller = new AbortController();
+
+      try {
+        // Assuming you want to DELETE the user, not PATCH
+        await axiosPrivate.delete(`/user/delete-user/${rowToDelete}`, {
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+        });
+
+        if (isMounted) {
+          // Update the state to reflect the deletion
+          setData((prevData) =>
+            prevData.filter((row) => row.id !== rowToDelete)
+          );
+          setRowToDelete(null);
+        }
+      } catch (err) {
+        if (!axios.isCancel(err)) {
+          console.error('Deletion failed:', err);
+          if (err.response) {
+            // Redirect on 403 Forbidden or show an error message
+            if (err.response.status === 403) {
+              navigate('/sign-in', {
+                state: { from: location },
+                replace: true,
+              });
+            } else {
+              alert(
+                `Error: ${err.response.data.message || 'An error occurred.'}`
+              );
+            }
+          }
+        }
+      } finally {
+        if (isMounted) {
+          setShowDeleteModal(false); // Close the modal upon completion or error
+        }
+      }
+
+      // Cleanup function to prevent state updates if the component unmounts
+      return () => {
+        isMounted = false;
+        controller.abort();
+      };
+    } else {
+      // If rowToDelete is null, just close the modal
+      setShowDeleteModal(false);
     }
-    setShowDeleteModal(false); // Close the modal
   };
 
-  const deleteSelectedRows = () => {
-    const newData = data.filter((row) => !selectedRows.has(row.id));
-    setData(newData);
-    setSelectedRows(new Set()); // Clear selected rows after deletion
-    setShowDeleteModal(false); // Close the modal
+  const deleteSelectedRows = async () => {
+    // Check if any rows are selected for deletion
+    if (selectedRows.size > 0) {
+      let isMounted = true;
+      const controller = new AbortController();
+
+      try {
+        // Convert selectedRows Set to an array of user IDs
+        const userIdsToDelete = Array.from(selectedRows);
+
+        await axiosPrivate.delete('/user/delete-users', {
+          data: { userIds: userIdsToDelete }, // Sending user IDs in the request body
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+        });
+
+        if (isMounted) {
+          // Filter out the deleted users from the current data
+          setData((prevData) =>
+            prevData.filter((row) => !selectedRows.has(row.id))
+          );
+          setSelectedRows(new Set()); // Clear selected rows after successful deletion
+        }
+      } catch (err) {
+        if (!axios.isCancel(err)) {
+          console.error('Deletion failed:', err);
+          if (err.response) {
+            // Handle specific HTTP status codes here
+            if (err.response.status === 403) {
+              navigate('/sign-in', {
+                state: { from: location },
+                replace: true,
+              });
+            } else {
+              alert(
+                `Error: ${err.response.data.message || 'An error occurred.'}`
+              );
+            }
+          }
+        }
+      } finally {
+        if (isMounted) {
+          setShowDeleteModal(false); // Close the modal upon completion or error
+        }
+      }
+
+      // Cleanup function to prevent state updates if the component unmounts
+      return () => {
+        isMounted = false;
+        controller.abort();
+      };
+    } else {
+      // If no rows were selected, just close the modal
+      setShowDeleteModal(false);
+    }
   };
 
   // Function to handle edit requests
@@ -120,7 +238,7 @@ const UsersList = () => {
     setShowContentModal(true);
   };
 
-  const handleAddNewSubmit = (event) => {
+  const handleAddNewSubmit = async (event) => {
     event.preventDefault();
 
     if (
@@ -136,28 +254,141 @@ const UsersList = () => {
       const updatedData = data.map((item) =>
         item.id === editableData.id ? { ...editableData } : item
       );
+
+      let isMounted = true;
+      const controller = new AbortController();
+
+      try {
+        const response = await axiosPrivate.patch(
+          `/user/update-user/${editableData.id}`,
+          {
+            username: editableData.username,
+            fullName: editableData.name,
+            gender: editableData.gender,
+            userRole: editableData.userRole,
+          },
+          {
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
+          }
+        );
+
+        if (isMounted) {
+          setShowContentModal(false);
+          // Reset form fields after successful add/edit
+          setEditableData({
+            username: '',
+            name: '',
+            email: '',
+            gender: '',
+            userRole: '',
+          });
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Submission failed:', err);
+          if (err.response) {
+            // Handle specific HTTP status codes here
+            if (err.response.status === 403) {
+              navigate('/sign-in', {
+                state: { from: location },
+                replace: true,
+              });
+            } else {
+              alert(
+                `Error: ${err.response.data.message || 'An error occurred.'}`
+              );
+            }
+          }
+        }
+      }
+
       setShowContentModal(false);
       setData(updatedData);
+
+      return () => {
+        isMounted = false;
+        controller.abort();
+      };
     } else if (modalMode === 'add') {
       if (editableData.password !== editableData.confirmPassword) {
         alert('Passwords do not match');
         return;
       }
 
-      const newEntry = {
-        ...editableData,
-        id: Math.max(0, ...data.map((d) => d.id)) + 1, // Generate new ID
-      };
+      // const newEntry = {
+      //   ...editableData,
+      //   id: Math.max(0, ...data.map((d) => d.id)) + 1, // Generate new ID
+      // };
 
-      setData([...data, newEntry]);
-      setShowContentModal(false);
-      setEditableData({
-        username: '',
-        name: '',
-        email: '',
-        gender: '',
-        userRole: '',
-      }); // Reset form
+      // setData([...data, newEntry]);
+
+      let isMounted = true;
+
+      const controller = new AbortController();
+
+      try {
+        const values = {
+          username: editableData.username,
+          email: editableData.email,
+          gender: editableData.gender,
+          fullName: editableData.name,
+          password: editableData.password,
+          confirmPassword: editableData.confirmPassword,
+          userRole: editableData.userRole,
+        };
+
+        console.log(values);
+
+        const response = await axiosPrivate.post(
+          '/company/invite-user',
+          values,
+          {
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
+          }
+        );
+
+        if (isMounted) {
+          // console.log(response.data);
+          setShowContentModal(false);
+          setEditableData({
+            username: '',
+            name: '',
+            email: '',
+            gender: '',
+            userRole: '',
+          }); // Reset form
+          // Handle successful submission (e.g., showing a success message, navigating to another page)
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Submission failed:', err);
+          // Handle errors (e.g., showing error message, navigating on certain conditions)
+          if (err.response) {
+            const statusCode = err.response.status;
+            if (statusCode === 403) {
+              // Token has expired, redirect to sign-in page
+              navigate('/sign-in', {
+                state: { from: location },
+                replace: true,
+              });
+            } else {
+              // Handle other errors here
+              console.error('Other error occurred:', err.response.data);
+            }
+          }
+        }
+      }
+
+      return () => {
+        isMounted = false;
+        controller.abort();
+      };
     }
   };
 
@@ -207,7 +438,7 @@ const UsersList = () => {
 
       {/* {showContentModal && <MyModal onClose={() => setShowContentModal(false)} />} */}
       <TableUserList
-        data={data}
+        data={searchResults}
         columns={column}
         selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
@@ -430,181 +661,5 @@ const UsersList = () => {
     </div>
   );
 };
-
-// const UsersList = () => {
-//   const companyName = 'TranXEnergy Inc';
-//   const data = usersData;
-//   const upperUserLimit = 10;
-
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [searchResults, setSearchResults] = useState(data);
-//   const [itemsPerPage, setItemsPerPage] = useState(4);
-//   const totalPages = Math.ceil(data.length / itemsPerPage);
-//   const lastIndex = currentPage * itemsPerPage;
-//   const firstIndex = lastIndex - itemsPerPage;
-//   const currentItems = searchResults.slice(firstIndex, lastIndex);
-
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-//   const [currentUser, setCurrentUser] = useState(null);
-
-//   const openModal = (user) => {
-//     setCurrentUser(user);
-//     setIsModalOpen(true);
-//   };
-
-//   const closeModal = () => {
-//     setIsModalOpen(false);
-//     setCurrentUser(null);
-//   };
-
-//   const truncateText = (text, maxLength) =>
-//     text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-
-//   const goToPage = (pageNum) => {
-//     if (pageNum < 1) setCurrentPage(1);
-//     else if (pageNum > totalPages) setCurrentPage(totalPages);
-//     else setCurrentPage(pageNum);
-//   };
-
-//   useEffect(() => {
-//     const handleKeyPress = (e) => {
-//       if (e.key === 'ArrowLeft') {
-//         goToPage(currentPage - 1);
-//       } else if (e.key === 'ArrowRight') {
-//         goToPage(currentPage + 1);
-//       }
-//     };
-
-//     window.addEventListener('keydown', handleKeyPress);
-//     return () => window.removeEventListener('keydown', handleKeyPress);
-//   }, [currentPage, totalPages]);
-
-//   useEffect(() => {
-//     const checkAspectRatio = () => {
-//       const aspectRatio = window.innerWidth / window.innerHeight;
-//       if (window.innerHeight <= 650) {
-//         setItemsPerPage(4);
-//       } else if (window.innerHeight <= 750) {
-//         setItemsPerPage(5);
-//       } else if (window.innerHeight <= 920) {
-//         setItemsPerPage(8);
-//       } else if (window.innerHeight <= 1000) {
-//         setItemsPerPage(9);
-//       } else if (window.innerHeight <= 1200) {
-//         setItemsPerPage(12);
-//       }
-//       // setItemsPerPage(aspectRatio < 1 ? 6 : 4); // Display more items if height > width
-//     };
-
-//     checkAspectRatio(); // Check on component mount
-//     window.addEventListener('resize', checkAspectRatio); // Adjust on window resize
-//     return () => window.removeEventListener('resize', checkAspectRatio);
-//   }, []);
-
-//   const fuse = new Fuse(data, {
-//     keys: ['username', 'name'],
-//     includeScore: true,
-//   });
-
-//   const handleSearch = (query) => {
-//     if (query) {
-//       setSearchResults(fuse.search(query).map((result) => result.item));
-//     } else {
-//       setSearchResults(data);
-//     }
-//     setCurrentPage(1);
-//   };
-
-//   // Function to update a user's role
-//   const updateUser = (updatedUser) => {
-//     setSearchResults((prevUsers) =>
-//       prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
-//     );
-//   };
-
-//   // Function to delete a user
-//   const deleteUser = (userId) => {
-//     setSearchResults((prevUsers) =>
-//       prevUsers.filter((user) => user.id !== userId)
-//     );
-//   };
-
-//   return (
-//     <div className="flex flex-col bg-slate-400 dark:bg-stone-800 w-full p-4 h-full">
-//       <div className="flex flex-row pb-3">
-//         <h2 className="hidden md:flex text-xl text-gray-800 dark:text-gray-100 font-semibold items-center pr-5">
-//           {companyName}
-//           <FaChessKing
-//             className="hidden md:flex ml-5 text-amber-900 dark:text-amber-200"
-//             size={25}
-//           />
-//         </h2>
-//         <p className="text-sm text-gray-800 dark:text-gray-100 font-semibold flex items-center pr-5">
-//           Total Company User: {data.length}/{upperUserLimit}
-//         </p>
-//         <button className="text-sm text-gray-800 dark:text-gray-800 font-semibold flex items-center px-4 py-2 bg-amber-300 dark:bg-amber-200 dark:hover:bg-amber-400 hover:bg-blue-600 rounded-md transition duration-300 ease-in-out">
-//           <FiPlusCircle className="mr-2" />
-//           Create New User
-//         </button>
-//       </div>
-//       <div className="flex flex-col h-full">
-//         <SearchBar onSearch={handleSearch} />
-//         <div className="flex flex-col h-full overflow-auto w-full">
-//           <table className="min-w-full text-gray-800 dark:text-gray-100">
-//             <thead>
-//               <tr className="bg-gray-200 dark:bg-gray-700">
-//                 <th className="px-4 py-3 text-left">Display Name</th>
-//                 <th className="px-4 py-3 text-left hidden md:table-cell">
-//                   Full Name
-//                 </th>
-//                 <th className="px-4 py-3 text-left hidden md:table-cell">
-//                   Position
-//                 </th>
-//                 <th className="px-4 py-3 text-left hidden md:table-cell">
-//                   Gender
-//                 </th>
-//                 <th className="px-4 py-3 text-left">User Role</th>
-//                 <th className="px-4 py-3 text-left">Actions</th>
-//               </tr>
-//             </thead>
-//             <tbody className="z-1">
-//               {currentItems.map((user) => (
-//                 <UserItem
-//                   key={user.id}
-//                   user={user}
-//                   openModal={() => openModal(user)}
-//                 />
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       </div>
-
-//       <UserModal
-//         isOpen={isModalOpen}
-//         onClose={closeModal}
-//         user={currentUser}
-//         updateUser={updateUser}
-//         deleteUser={deleteUser}
-//       />
-
-//       <div className="flex justify-between items-center mt-4">
-//         <FiChevronLeft
-//           className="cursor-pointer dark:text-white"
-//           onClick={() => goToPage(currentPage - 1)}
-//           title="Previous Page"
-//         />
-//         <span className="dark:text-white">
-//           Page {currentPage} of {totalPages}
-//         </span>
-//         <FiChevronRight
-//           className="cursor-pointer dark:text-white"
-//           onClick={() => goToPage(currentPage + 1)}
-//           title="Next Page"
-//         />
-//       </div>
-//     </div>
-//   );
-// };
 
 export default UsersList;

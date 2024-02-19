@@ -1,15 +1,58 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
+import axios from 'axios';
 
 const AccountInfoModal = ({ closeModal }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const axiosPrivate = useAxiosPrivate();
+
   const [formData, setFormData] = useState({
     username: '',
     firstName: '',
     lastName: '',
-    companyName: 'Example Company', // Assuming these values are fetched or set as constants
-    email: 'user@example.com',
-    userRole: 'Standard', // Example roles: Editor/Admin/Company Admin/Standard
+    companyName: '', // Assuming these values are fetched or set as constants
+    email: '',
+    userRole: '', // Example roles: Editor/Admin/Company Admin/Standard
   });
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const getUsername = async () => {
+      try {
+        const response = await axiosPrivate.get('/user/get-userinfo', {
+          signal: controller.signal,
+        });
+        // console.log(response.data);
+        if (isMounted) {
+          setFormData({
+            ...response.data,
+          });
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          // Log for debugging purposes
+          // console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Request failed:', err);
+          // Only navigate if the error was not a cancellation
+          navigate('/sign-in', { state: { from: location }, replace: true });
+        }
+      }
+    };
+
+    getUsername();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      // console.log('Cleanup: Cancelled any ongoing requests.');
+    };
+  }, [navigate, location, axiosPrivate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,7 +60,7 @@ const AccountInfoModal = ({ closeModal }) => {
     // Optionally validate input and set errors
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Perform validation
     let newErrors = {};
@@ -27,8 +70,52 @@ const AccountInfoModal = ({ closeModal }) => {
 
     if (Object.keys(newErrors).length === 0) {
       console.log('Submitting data...', formData);
+      let isMounted = true;
+
+      const controller = new AbortController();
+      try {
+        const values = {
+          username: formData.username,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+        };
+
+        const response = await axiosPrivate.post(
+          '/user/update-userinfo',
+          values,
+          {
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
+          }
+        );
+
+        if (isMounted) {
+          // console.log(response.data);
+          closeModal();
+          // Handle successful submission (e.g., showing a success message, navigating to another page)
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Submission failed:', err);
+          // Handle errors (e.g., showing error message, navigating on certain conditions)
+          if (err.response) {
+            const statusCode = err.response.status;
+            if (statusCode === 403) {
+              // Token has expired, redirect to sign-in page
+              navigate('/sign-in', {
+                state: { from: location },
+                replace: true,
+              });
+            } else {
+              // Handle other errors here
+              console.error('Other error occurred:', err.response.data);
+            }
+          }
+        }
+      }
       // Here, handle the submission logic
-      closeModal();
     } else {
       setErrors(newErrors);
     }

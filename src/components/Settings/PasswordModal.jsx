@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { useLocation, useNavigate } from 'react-router-dom';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
+import axios from 'axios';
 
 const PasswordModal = ({ closeModal }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const axiosPrivate = useAxiosPrivate();
+
   const [passwordData, setPasswordData] = useState({
     oldPassword: '',
     newPassword: '',
@@ -35,7 +42,7 @@ const PasswordModal = ({ closeModal }) => {
     return false;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (
       !passwordData.oldPassword ||
@@ -49,8 +56,44 @@ const PasswordModal = ({ closeModal }) => {
       setPasswordError('New password and confirm password do not match');
       return;
     }
-    console.log('Password updated:', passwordData.newPassword);
-    closeModal();
+
+    let isMounted = true;
+
+    const controller = new AbortController();
+    try {
+      const values = {
+        ...passwordData,
+      };
+
+      const response = await axiosPrivate.post('/user/set-password', values, {
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+      });
+
+      if (isMounted) {
+        // console.log(response.data);
+        console.log('Password successfully updated');
+        closeModal();
+        // Handle successful submission (e.g., showing a success message, navigating to another page)
+      }
+    } catch (err) {
+      if (axios.isCancel(err)) {
+        console.log('Request cancelled:', err.message);
+      } else if (err.response) {
+        console.error('Password update failed:', err.response.data.message);
+        setPasswordError(err.response.data.message); // Set the error message from the backend
+        if (err.response.status === 401) {
+          // Token has expired, redirect to sign-in page
+          navigate('/sign-in', {
+            state: { from: location },
+            replace: true,
+          });
+        }
+      } else {
+        console.error('An unexpected error occurred:', err);
+        setPasswordError('An unexpected error occurred. Please try again.');
+      }
+    }
   };
 
   const checkPasswordStrength = (password) => {
