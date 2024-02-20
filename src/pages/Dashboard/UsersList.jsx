@@ -241,6 +241,7 @@ const UsersList = () => {
   const handleAddNewSubmit = async (event) => {
     event.preventDefault();
 
+    // Basic validation
     if (
       editableData.username.trim().length < 3 ||
       editableData.name.trim().length < 3
@@ -249,148 +250,227 @@ const UsersList = () => {
       return;
     }
 
-    if (modalMode === 'edit') {
-      // Update existing data
-      const updatedData = data.map((item) =>
-        item.id === editableData.id ? { ...editableData } : item
-      );
+    if (
+      modalMode === 'add' &&
+      editableData.password !== editableData.confirmPassword
+    ) {
+      alert('Passwords do not match');
+      return;
+    }
 
-      let isMounted = true;
-      const controller = new AbortController();
+    const endpoint =
+      modalMode === 'edit'
+        ? `/user/update-user/${editableData.id}`
+        : '/company/invite-user';
+    const method = modalMode === 'edit' ? 'patch' : 'post';
 
-      try {
-        const response = await axiosPrivate.patch(
-          `/user/update-user/${editableData.id}`,
-          {
+    // Prepare the data payload
+    const payload =
+      modalMode === 'edit'
+        ? {
             username: editableData.username,
             fullName: editableData.name,
             gender: editableData.gender,
             userRole: editableData.userRole,
-          },
-          {
-            headers: { 'Content-Type': 'application/json' },
-            signal: controller.signal,
           }
-        );
+        : {
+            ...editableData,
+            password: editableData.password,
+            confirmPassword: editableData.confirmPassword,
+          };
 
-        if (isMounted) {
-          setShowContentModal(false);
-          // Reset form fields after successful add/edit
-          setEditableData({
-            username: '',
-            name: '',
-            email: '',
-            gender: '',
-            userRole: '',
-          });
-        }
-      } catch (err) {
-        if (axios.isCancel(err)) {
-          console.log('Request cancelled:', err.message);
-        } else {
-          console.error('Submission failed:', err);
-          if (err.response) {
-            // Handle specific HTTP status codes here
-            if (err.response.status === 403) {
-              navigate('/sign-in', {
-                state: { from: location },
-                replace: true,
-              });
-            } else {
-              alert(
-                `Error: ${err.response.data.message || 'An error occurred.'}`
-              );
-            }
-          }
-        }
+    try {
+      const response = await axiosPrivate[method](endpoint, payload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      // Update the state based on the modal mode
+      if (modalMode === 'edit') {
+        setData((currentData) =>
+          currentData.map((item) =>
+            item.id === editableData.id ? { ...item, ...response.data } : item
+          )
+        );
+      } else {
+        // Assuming the response includes the newly added user
+        setData((currentData) => [...currentData, response.data]);
       }
 
+      // Reset form and close modal
+      setEditableData({
+        username: '',
+        name: '',
+        email: '',
+        gender: '',
+        userRole: '',
+      });
       setShowContentModal(false);
-      setData(updatedData);
-
-      return () => {
-        isMounted = false;
-        controller.abort();
-      };
-    } else if (modalMode === 'add') {
-      if (editableData.password !== editableData.confirmPassword) {
-        alert('Passwords do not match');
-        return;
-      }
-
-      // const newEntry = {
-      //   ...editableData,
-      //   id: Math.max(0, ...data.map((d) => d.id)) + 1, // Generate new ID
-      // };
-
-      // setData([...data, newEntry]);
-
-      let isMounted = true;
-
-      const controller = new AbortController();
-
-      try {
-        const values = {
-          username: editableData.username,
-          email: editableData.email,
-          gender: editableData.gender,
-          fullName: editableData.name,
-          password: editableData.password,
-          confirmPassword: editableData.confirmPassword,
-          userRole: editableData.userRole,
-        };
-
-        console.log(values);
-
-        const response = await axiosPrivate.post(
-          '/company/invite-user',
-          values,
-          {
-            headers: { 'Content-Type': 'application/json' },
-            signal: controller.signal,
-          }
-        );
-
-        if (isMounted) {
-          // console.log(response.data);
-          setShowContentModal(false);
-          setEditableData({
-            username: '',
-            name: '',
-            email: '',
-            gender: '',
-            userRole: '',
-          }); // Reset form
-          // Handle successful submission (e.g., showing a success message, navigating to another page)
-        }
-      } catch (err) {
-        if (axios.isCancel(err)) {
-          console.log('Request cancelled:', err.message);
+    } catch (err) {
+      if (!axios.isCancel(err)) {
+        console.error('Submission failed:', err);
+        const errorMsg = err.response?.data.message || 'An error occurred.';
+        if (err.response?.status === 403) {
+          navigate('/sign-in', { state: { from: location }, replace: true });
         } else {
-          console.error('Submission failed:', err);
-          // Handle errors (e.g., showing error message, navigating on certain conditions)
-          if (err.response) {
-            const statusCode = err.response.status;
-            if (statusCode === 403) {
-              // Token has expired, redirect to sign-in page
-              navigate('/sign-in', {
-                state: { from: location },
-                replace: true,
-              });
-            } else {
-              // Handle other errors here
-              console.error('Other error occurred:', err.response.data);
-            }
-          }
+          alert(`Error: ${errorMsg}`);
         }
       }
-
-      return () => {
-        isMounted = false;
-        controller.abort();
-      };
     }
   };
+
+  // const handleAddNewSubmit = async (event) => {
+  //   event.preventDefault();
+
+  //   if (
+  //     editableData.username.trim().length < 3 ||
+  //     editableData.name.trim().length < 3
+  //   ) {
+  //     alert('Username and Name must be at least 3 characters long');
+  //     return;
+  //   }
+
+  //   if (modalMode === 'edit') {
+  //     // Update existing data
+  //     const updatedData = data.map((item) =>
+  //       item.id === editableData.id ? { ...editableData } : item
+  //     );
+
+  //     let isMounted = true;
+  //     const controller = new AbortController();
+
+  //     try {
+  //       const response = await axiosPrivate.patch(
+  //         `/user/update-user/${editableData.id}`,
+  //         {
+  //           username: editableData.username,
+  //           fullName: editableData.name,
+  //           gender: editableData.gender,
+  //           userRole: editableData.userRole,
+  //         },
+  //         {
+  //           headers: { 'Content-Type': 'application/json' },
+  //           signal: controller.signal,
+  //         }
+  //       );
+
+  //       if (isMounted) {
+  //         setShowContentModal(false);
+  //         // Reset form fields after successful add/edit
+  //         setEditableData({
+  //           username: '',
+  //           name: '',
+  //           email: '',
+  //           gender: '',
+  //           userRole: '',
+  //         });
+  //       }
+  //     } catch (err) {
+  //       if (axios.isCancel(err)) {
+  //         console.log('Request cancelled:', err.message);
+  //       } else {
+  //         console.error('Submission failed:', err);
+  //         if (err.response) {
+  //           // Handle specific HTTP status codes here
+  //           if (err.response.status === 403) {
+  //             navigate('/sign-in', {
+  //               state: { from: location },
+  //               replace: true,
+  //             });
+  //           } else {
+  //             alert(
+  //               `Error: ${err.response.data.message || 'An error occurred.'}`
+  //             );
+  //           }
+  //         }
+  //       }
+  //     }
+
+  //     setShowContentModal(false);
+  //     setData(updatedData);
+
+  //     return () => {
+  //       isMounted = false;
+  //       controller.abort();
+  //     };
+  //   } else if (modalMode === 'add') {
+  //     if (editableData.password !== editableData.confirmPassword) {
+  //       alert('Passwords do not match');
+  //       return;
+  //     }
+
+  //     // const newEntry = {
+  //     //   ...editableData,
+  //     //   id: Math.max(0, ...data.map((d) => d.id)) + 1, // Generate new ID
+  //     // };
+
+  //     // setData([...data, newEntry]);
+
+  //     let isMounted = true;
+
+  //     const controller = new AbortController();
+
+  //     try {
+  //       const values = {
+  //         username: editableData.username,
+  //         email: editableData.email,
+  //         gender: editableData.gender,
+  //         fullName: editableData.name,
+  //         password: editableData.password,
+  //         confirmPassword: editableData.confirmPassword,
+  //         userRole: editableData.userRole,
+  //       };
+
+  //       console.log(values);
+
+  //       const response = await axiosPrivate.post(
+  //         '/company/invite-user',
+  //         values,
+  //         {
+  //           headers: { 'Content-Type': 'application/json' },
+  //           signal: controller.signal,
+  //         }
+  //       );
+
+  //       if (isMounted) {
+  //         // console.log(response.data);
+  //         setShowContentModal(false);
+  //         setEditableData({
+  //           username: '',
+  //           name: '',
+  //           email: '',
+  //           gender: '',
+  //           userRole: '',
+  //         }); // Reset form
+  //         // Handle successful submission (e.g., showing a success message, navigating to another page)
+  //       }
+  //     } catch (err) {
+  //       if (axios.isCancel(err)) {
+  //         console.log('Request cancelled:', err.message);
+  //       } else {
+  //         console.error('Submission failed:', err);
+  //         // Handle errors (e.g., showing error message, navigating on certain conditions)
+  //         if (err.response) {
+  //           const statusCode = err.response.status;
+  //           if (statusCode === 403) {
+  //             // Token has expired, redirect to sign-in page
+  //             navigate('/sign-in', {
+  //               state: { from: location },
+  //               replace: true,
+  //             });
+  //           } else {
+  //             // Handle other errors here
+  //             console.error('Other error occurred:', err.response.data);
+  //           }
+  //         }
+  //       }
+  //     }
+
+  //     return () => {
+  //       isMounted = false;
+  //       controller.abort();
+  //     };
+  //   }
+  // };
 
   if (isLoading) {
     return <div>Loading...</div>; // Or any loading spinner

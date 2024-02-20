@@ -2,52 +2,86 @@ import { PieChartRenderer } from '../../components/Charts';
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useLocation, useNavigate } from 'react-router-dom';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import axios from 'axios';
 
 const TotalCarbonEmission = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const axiosPrivate = useAxiosPrivate();
+
   const [startDate, setStartDate] = useState(
     new Date(new Date().setMonth(new Date().getMonth() - 1))
   );
   const [endDate, setEndDate] = useState(new Date());
   const [pieData, setPieData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    // const fetchData = async () => {
-    //   try {
-    //     const response = await axios.get('your-api-endpoint', {
-    //       params: {
-    //         startDate: startDate.toISOString(),
-    //         endDate: endDate.toISOString(),
-    //       },
-    //     });
-    //     setPieData(response.data);
-    //   } catch (error) {
-    //     console.error('Error fetching data:', error);
-    //   }
-    // };
 
-    // fetchData();
-    setPieData([
-      {
-        id: 'Scope I',
-        label: 'Scope I',
-        value: 16,
-        color: 'hsl(324, 70%, 50%)',
-      },
-      {
-        id: 'Scope II',
-        label: 'Scope II',
-        value: 36,
-        color: 'hsl(353, 70%, 50%)',
-      },
-      {
-        id: 'Scope III',
-        label: 'Scope III',
-        value: 125,
-        color: 'hsl(99, 70%, 50%)',
-      },
-    ]);
-  }, [startDate, endDate]);
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axiosPrivate.post(
+          '/record/total-emission-by-scope',
+          {
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+          },
+          {
+            signal: controller.signal,
+          }
+        );
+
+        if (isMounted) {
+          setPieData([
+            {
+              id: 'Scope I',
+              label: 'Scope I',
+              value: response.data?.totalEmissionsByScope['1'] || 0,
+              color: 'hsl(324, 70%, 50%)',
+            },
+            {
+              id: 'Scope II',
+              label: 'Scope II',
+              value: response.data?.totalEmissionsByScope['2'] || 0,
+              color: 'hsl(353, 70%, 50%)',
+            },
+            {
+              id: 'Scope III',
+              label: 'Scope III',
+              value: response.data?.totalEmissionsByScope['3'] || 0,
+              color: 'hsl(99, 70%, 50%)',
+            },
+          ]);
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          // Log for debugging purposes
+          // console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Request failed:', err);
+          // Only navigate if the error was not a cancellation
+          // Check for a 403 status code specifically
+          if (err.response && err.response.status === 403) {
+            navigate('/sign-in', { state: { from: location }, replace: true });
+          }
+        }
+      }
+      setIsLoading(false);
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      // console.log('Cleanup: Cancelled any ongoing requests.');
+    };
+  }, [navigate, location, axiosPrivate, startDate, endDate]);
 
   const handleFilterSubmit = async (event) => {
     event.preventDefault();
@@ -56,17 +90,68 @@ const TotalCarbonEmission = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const response = await axios.get('/your-endpoint', {
-        params: { start: startDate, end: endDate },
-      });
-      setPieData(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axiosPrivate.post(
+          '/record/total-emission-by-scope',
+          {
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+          },
+          {
+            signal: controller.signal,
+          }
+        );
+
+        if (isMounted) {
+          setPieData([
+            {
+              id: 'Scope I',
+              label: 'Scope I',
+              value: response.data?.totalEmissionsByScope['1'] || 0,
+              color: 'hsl(324, 70%, 50%)',
+            },
+            {
+              id: 'Scope II',
+              label: 'Scope II',
+              value: response.data?.totalEmissionsByScope['2'] || 0,
+              color: 'hsl(353, 70%, 50%)',
+            },
+            {
+              id: 'Scope III',
+              label: 'Scope III',
+              value: response.data?.totalEmissionsByScope['3'] || 0,
+              color: 'hsl(99, 70%, 50%)',
+            },
+          ]);
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          // Log for debugging purposes
+          // console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Request failed:', err);
+          // Only navigate if the error was not a cancellation
+          // Check for a 403 status code specifically
+          if (err.response && err.response.status === 403) {
+            navigate('/sign-in', { state: { from: location }, replace: true });
+          }
+        }
+      }
       setIsLoading(false);
-    }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      // console.log('Cleanup: Cancelled any ongoing requests.');
+    };
   };
 
   return (

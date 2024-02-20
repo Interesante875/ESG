@@ -1,52 +1,70 @@
-import { WaffleChartRenderer, BoxCard } from '../../components/Charts';
+import { BoxCard } from '../../components/Charts';
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdPeopleOutline } from 'react-icons/md';
+import { useLocation, useNavigate } from 'react-router-dom';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import axios from 'axios';
-import user_emission_data from '../../fake_data/MOCK_DATA_AVG_EMISSION.json';
 
 const EmployeeFootprint = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const axiosPrivate = useAxiosPrivate();
+
+  const [data, setData] = useState([]);
   const [startDate, setStartDate] = useState(
     new Date(new Date().setMonth(new Date().getMonth() - 1))
   );
   const [endDate, setEndDate] = useState(new Date());
-  const [waffleData, setWaffleData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    // const fetchData = async () => {
-    //   try {
-    //     const response = await axios.get('your-api-endpoint', {
-    //       params: {
-    //         startDate: startDate.toISOString(),
-    //         endDate: endDate.toISOString(),
-    //       },
-    //     });
-    //     setPieData(response.data);
-    //   } catch (error) {
-    //     console.error('Error fetching data:', error);
-    //   }
-    // };
 
-    // fetchData();
-    setWaffleData([
-      {
-        id: 'scope_I',
-        label: 'scope_I',
-        value: 16.255085230251662,
-      },
-      {
-        id: 'scope_II',
-        label: 'scope_II',
-        value: 6.87997540516551,
-      },
-      {
-        id: 'scope_III',
-        label: 'scope_III',
-        value: 23.200786023450046,
-      },
-    ]);
-  }, [startDate, endDate]);
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axiosPrivate.post(
+          '/record/total-emission-by-user',
+          {
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+          },
+          {
+            signal: controller.signal,
+          }
+        );
+
+        if (isMounted) {
+          // console.log(response.data);
+          setData(response.data);
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          // Log for debugging purposes
+          // console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Request failed:', err);
+          // Only navigate if the error was not a cancellation
+          // Check for a 403 status code specifically
+          if (err.response && err.response.status === 403) {
+            navigate('/sign-in', { state: { from: location }, replace: true });
+          }
+        }
+      }
+      setIsLoading(false);
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      // console.log('Cleanup: Cancelled any ongoing requests.');
+    };
+  }, [navigate, location, axiosPrivate, startDate, endDate]);
 
   const handleFilterSubmit = async (event) => {
     event.preventDefault();
@@ -55,17 +73,50 @@ const EmployeeFootprint = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const response = await axios.get('/your-endpoint', {
-        params: { start: startDate, end: endDate },
-      });
-      setWaffleData(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axiosPrivate.post(
+          '/record/total-emission-by-user',
+          {
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
+          },
+          {
+            signal: controller.signal,
+          }
+        );
+
+        if (isMounted) {
+          console.log(response.data);
+          setData(response.data);
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          // Log for debugging purposes
+          // console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Request failed:', err);
+          // Only navigate if the error was not a cancellation
+          // Check for a 403 status code specifically
+          if (err.response && err.response.status === 403) {
+            navigate('/sign-in', { state: { from: location }, replace: true });
+          }
+        }
+      }
       setIsLoading(false);
-    }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      // console.log('Cleanup: Cancelled any ongoing requests.');
+    };
   };
 
   return (
@@ -125,11 +176,11 @@ const EmployeeFootprint = () => {
       ) : (
         <div className="flex flex-row flex-wrap overflow--y-auto">
           {/* <WaffleChartRenderer data={waffleData} /> */}
-          {user_emission_data.map((data, index) => (
+          {data.map((user, index) => (
             <BoxCard
               key={index}
-              title={`Total Emission by ${data.username}`}
-              value={data.value}
+              title={`Total Emission by ${user.username}`}
+              value={user.totalEmission}
               unit={'kgCO2e'}
               Icon={MdPeopleOutline}
               // link={`/employee-carbon/${data.id}`}

@@ -1,331 +1,123 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useLocation, useNavigate } from 'react-router-dom';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
 import axios from 'axios';
 import { BumpChartRenderer } from '../../components/Charts';
 
 const ChangeInEmission = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const axiosPrivate = useAxiosPrivate();
+
   const [startDate, setStartDate] = useState(
-    new Date(new Date().setFullYear(new Date().getFullYear() - 1))
-  ); // January 1st of the current year
+    new Date(new Date().getFullYear() - 1, 0, 1)
+  );
   const [endDate, setEndDate] = useState(
-    new Date(new Date().getFullYear(), 0, 1)
+    new Date(new Date().getFullYear(), 11, 31)
   ); // Current date one year ago
   const [bumpData, setBumpData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    // const fetchData = async () => {
-    //   try {
-    //     const response = await axios.get('your-api-endpoint', {
-    //       params: {
-    //         startDate: startDate.toISOString(),
-    //         endDate: endDate.toISOString(),
-    //       },
-    //     });
-    //     setPieData(response.data);
-    //   } catch (error) {
-    //     console.error('Error fetching data:', error);
-    //   }
-    // };
 
-    // fetchData();
-    setBumpData([
-      {
-        id: 'Serie 1',
-        data: [
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axiosPrivate.post(
+          '/record/total-emission-by-year',
           {
-            x: 2000,
-            y: 8,
+            startYear: startDate.toISOString(),
+            endYear: endDate.toISOString(),
           },
           {
-            x: 2001,
-            y: 10,
-          },
-          {
-            x: 2002,
-            y: 9,
-          },
-          {
-            x: 2003,
-            y: 8,
-          },
-          {
-            x: 2004,
-            y: 10,
-          },
-        ],
-      },
-      {
-        id: 'Serie 2',
-        data: [
-          {
-            x: 2000,
-            y: 5,
-          },
-          {
-            x: 2001,
-            y: 1,
-          },
-          {
-            x: 2002,
-            y: 2,
-          },
-          {
-            x: 2003,
-            y: 12,
-          },
-          {
-            x: 2004,
-            y: 8,
-          },
-        ],
-      },
-      {
-        id: 'Serie 3',
-        data: [
-          {
-            x: 2000,
-            y: 3,
-          },
-          {
-            x: 2001,
-            y: 2,
-          },
-          {
-            x: 2002,
-            y: 8,
-          },
-          {
-            x: 2003,
-            y: 1,
-          },
-          {
-            x: 2004,
-            y: 11,
-          },
-        ],
-      },
-      {
-        id: 'Serie 4',
-        data: [
-          {
-            x: 2000,
-            y: 9,
-          },
-          {
-            x: 2001,
-            y: 5,
-          },
-          {
-            x: 2002,
-            y: 7,
-          },
-          {
-            x: 2003,
-            y: 10,
-          },
-          {
-            x: 2004,
-            y: 12,
-          },
-        ],
-      },
-      {
-        id: 'Serie 5',
-        data: [
-          {
-            x: 2000,
-            y: 10,
-          },
-          {
-            x: 2001,
-            y: 12,
-          },
-          {
-            x: 2002,
-            y: 11,
-          },
-          {
-            x: 2003,
-            y: 9,
-          },
-          {
-            x: 2004,
-            y: 4,
-          },
-        ],
-      },
-      {
-        id: 'Serie 6',
-        data: [
-          {
-            x: 2000,
-            y: 12,
-          },
-          {
-            x: 2001,
-            y: 9,
-          },
-          {
-            x: 2002,
-            y: 12,
-          },
-          {
-            x: 2003,
-            y: 2,
-          },
-          {
-            x: 2004,
-            y: 9,
-          },
-        ],
-      },
-      {
-        id: 'Serie 7',
-        data: [
-          {
-            x: 2000,
-            y: 6,
-          },
-          {
-            x: 2001,
-            y: 3,
-          },
-          {
-            x: 2002,
-            y: 4,
-          },
-          {
-            x: 2003,
-            y: 6,
-          },
-          {
-            x: 2004,
-            y: 7,
-          },
-        ],
-      },
-      {
-        id: 'Serie 8',
-        data: [
-          {
-            x: 2000,
-            y: 11,
-          },
-          {
-            x: 2001,
-            y: 8,
-          },
-          {
-            x: 2002,
-            y: 3,
-          },
-          {
-            x: 2003,
-            y: 5,
-          },
-          {
-            x: 2004,
-            y: 5,
-          },
-        ],
-      },
-      {
-        id: 'Serie 9',
-        data: [
-          {
-            x: 2000,
-            y: 2,
-          },
-          {
-            x: 2001,
-            y: 7,
-          },
-          {
-            x: 2002,
-            y: 5,
-          },
-          {
-            x: 2003,
-            y: 3,
-          },
-          {
-            x: 2004,
-            y: 2,
-          },
-        ],
-      },
-      {
-        id: 'Serie 10',
-        data: [
-          {
-            x: 2000,
-            y: 1,
-          },
-          {
-            x: 2001,
-            y: 4,
-          },
-          {
-            x: 2002,
-            y: 6,
-          },
-          {
-            x: 2003,
-            y: 4,
-          },
-          {
-            x: 2004,
-            y: 3,
-          },
-        ],
-      },
-      {
-        id: 'Serie 11',
-        data: [
-          {
-            x: 2000,
-            y: 4,
-          },
-          {
-            x: 2001,
-            y: 6,
-          },
-          {
-            x: 2002,
-            y: 10,
-          },
-          {
-            x: 2003,
-            y: 11,
-          },
-          {
-            x: 2004,
-            y: 1,
-          },
-        ],
-      },
-    ]);
-  }, [startDate, endDate]);
+            signal: controller.signal,
+          }
+        );
+
+        if (isMounted) {
+          // console.log(response.data);
+          setBumpData(response.data.formattedOutput);
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          // Log for debugging purposes
+          // console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Request failed:', err);
+          // Only navigate if the error was not a cancellation
+          // Check for a 403 status code specifically
+          if (err.response && err.response.status === 403) {
+            navigate('/sign-in', { state: { from: location }, replace: true });
+          }
+        }
+      }
+      setIsLoading(false);
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      // console.log('Cleanup: Cancelled any ongoing requests.');
+    };
+  }, [navigate, location, axiosPrivate, startDate, endDate]);
 
   const handleFilterSubmit = async (event) => {
     event.preventDefault();
-    if (endDate < startDate) {
+    if (endDate <= startDate) {
       alert('End date must be greater than or equal to start date.');
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const response = await axios.get('/your-endpoint', {
-        params: { start: startDate, end: endDate },
-      });
-      setBumpData(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axiosPrivate.post(
+          '/record/total-emission-by-year',
+          {
+            startYear: startDate.toISOString(),
+            endYear: endDate.toISOString(),
+          },
+          {
+            signal: controller.signal,
+          }
+        );
+
+        if (isMounted) {
+          console.log(response.data);
+          setBumpData(response.data.formattedOutput);
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          // Log for debugging purposes
+          // console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Request failed:', err);
+          // Only navigate if the error was not a cancellation
+          // Check for a 403 status code specifically
+          if (err.response && err.response.status === 403) {
+            navigate('/sign-in', { state: { from: location }, replace: true });
+          }
+        }
+      }
       setIsLoading(false);
-    }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      // console.log('Cleanup: Cancelled any ongoing requests.');
+    };
   };
 
   return (

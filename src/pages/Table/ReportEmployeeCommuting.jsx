@@ -1,18 +1,18 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DateTime } from 'luxon';
-import {
-  TableEmployeeCommuting,
-  TableStationaryCombustion,
-} from '../../components/Table';
+import { TableEmployeeCommuting } from '../../components/Table';
 import { columnDefinition } from '../../components/Table/column';
-import axios from 'axios';
 import { FiPlus, FiTrash } from 'react-icons/fi';
-import { FaTrashAlt } from 'react-icons/fa';
-import MOCK_DATA_Stationary_Fuels_3 from '../../fake_data/MOCK_DATA_Stationary_Fuels_3.json';
+import { useLocation, useNavigate } from 'react-router-dom';
+import useAxiosPrivate from '../../hooks/useAxiosPrivate';
+import axios from 'axios';
 
 const ReportEmployeeCommuting = () => {
   // const data = MOCK_DATA_Stationary_Fuels_2;
   const column = columnDefinition;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const axiosPrivate = useAxiosPrivate();
 
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,20 +31,47 @@ const ReportEmployeeCommuting = () => {
   const [rowToDelete, setRowToDelete] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // const response = await axios.get('your-api-endpoint'); // Replace with your API endpoint
-        // setData(response.data);
-        setData(MOCK_DATA_Stationary_Fuels_3);
-      } catch (error) {
-        console.error('Error fetching data:', error);
+        const response = await axiosPrivate.get(
+          'record/read-records/scope/1/category/stationaryCombustion',
+          {
+            signal: controller.signal,
+          }
+        );
+
+        if (isMounted) {
+          // console.log(response.data);
+          setData(response.data);
+        }
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          // Log for debugging purposes
+          // console.log('Request cancelled:', err.message);
+        } else {
+          console.error('Request failed:', err);
+          // Only navigate if the error was not a cancellation
+          // Check for a 403 status code specifically
+          if (err.response && err.response.status === 403) {
+            navigate('/sign-in', { state: { from: location }, replace: true });
+          }
+        }
       }
       setIsLoading(false);
     };
 
     fetchData();
-  }, []);
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      // console.log('Cleanup: Cancelled any ongoing requests.');
+    };
+  }, [navigate, location, axiosPrivate]);
 
   const handleAddNewClick = () => {
     setEditableData({
@@ -72,19 +99,112 @@ const ReportEmployeeCommuting = () => {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (rowToDelete !== null) {
-      setData(data.filter((row) => row.id !== rowToDelete));
-      setRowToDelete(null);
+      let isMounted = true;
+      const controller = new AbortController();
+
+      try {
+        await axiosPrivate.delete(`/record/delete-record/${rowToDelete}`, {
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+        });
+
+        if (isMounted) {
+          // Update the state to reflect the deletion
+          setData((prevData) =>
+            prevData.filter((row) => row.id !== rowToDelete)
+          );
+          setRowToDelete(null);
+        }
+      } catch (err) {
+        if (!axios.isCancel(err)) {
+          console.error('Deletion failed:', err);
+          if (err.response) {
+            // Redirect on 403 Forbidden or show an error message
+            if (err.response.status === 403) {
+              navigate('/sign-in', {
+                state: { from: location },
+                replace: true,
+              });
+            } else {
+              alert(
+                `Error: ${err.response.data.message || 'An error occurred.'}`
+              );
+            }
+          }
+        }
+      } finally {
+        if (isMounted) {
+          setShowDeleteModal(false); // Close the modal upon completion or error
+        }
+      }
+
+      // Cleanup function to prevent state updates if the component unmounts
+      return () => {
+        isMounted = false;
+        controller.abort();
+      };
+    } else {
+      // If rowToDelete is null, just close the modal
+      setShowDeleteModal(false);
     }
-    setShowDeleteModal(false); // Close the modal
   };
 
-  const deleteSelectedRows = () => {
-    const newData = data.filter((row) => !selectedRows.has(row.id));
-    setData(newData);
-    setSelectedRows(new Set()); // Clear selected rows after deletion
-    setShowDeleteModal(false); // Close the modal
+  const deleteSelectedRows = async () => {
+    // Check if any rows are selected for deletion
+    if (selectedRows.size > 0) {
+      let isMounted = true;
+      const controller = new AbortController();
+
+      try {
+        const recordIdsToDelete = Array.from(selectedRows);
+
+        await axiosPrivate.delete('/record/delete-records', {
+          data: { ids: recordIdsToDelete }, // Sending user IDs in the request body
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+        });
+
+        if (isMounted) {
+          // Filter out the deleted users from the current data
+          setData((prevData) =>
+            prevData.filter((row) => !selectedRows.has(row.id))
+          );
+          setSelectedRows(new Set()); // Clear selected rows after successful deletion
+        }
+      } catch (err) {
+        if (!axios.isCancel(err)) {
+          console.error('Deletion failed:', err);
+          if (err.response) {
+            // Handle specific HTTP status codes here
+            if (err.response.status === 403) {
+              navigate('/sign-in', {
+                state: { from: location },
+                replace: true,
+              });
+            } else {
+              alert(
+                `Error: ${err.response.data.message || 'An error occurred.'}`
+              );
+            }
+          }
+        }
+      } finally {
+        if (isMounted) {
+          setShowDeleteModal(false); // Close the modal upon completion or error
+        }
+      }
+
+      // Cleanup function to prevent state updates if the component unmounts
+      return () => {
+        isMounted = false;
+        controller.abort();
+      };
+    } else {
+      // If no rows were selected, just close the modal
+      setShowDeleteModal(false);
+    }
   };
 
   // Function to handle edit requests
@@ -94,25 +214,44 @@ const ReportEmployeeCommuting = () => {
     setShowContentModal(true);
   };
 
-  const handleAddNewSubmit = (event) => {
+  const handleAddNewSubmit = async (event) => {
     event.preventDefault();
-    if (modalMode === 'edit') {
-      // Update existing data
-      const updatedData = data.map((item) =>
-        item.id === editableData.id ? { ...editableData } : item
-      );
-      setShowContentModal(false);
-      setData(updatedData);
-    } else if (modalMode === 'add') {
-      const newEntry = {
-        ...editableData,
-        id: Math.max(0, ...data.map((d) => d.id)) + 1, // Generate new ID
-        createdBy: 'currentUser', // Replace with actual user identifier if available
-        createdAt: DateTime.now().toISO(), // Current timestamp
-      };
 
-      setData([...data, newEntry]);
-      setShowContentModal(false);
+    const endpoint =
+      modalMode === 'edit'
+        ? `/record/edit-record/${editableData.id}`
+        : '/record/create-record';
+    const method = modalMode === 'edit' ? 'patch' : 'post';
+
+    // Prepare the data payload
+    const payload = {
+      scope: 3,
+      category: 'employeeCommuting',
+      type: editableData.type,
+      source: editableData.source,
+      unit: editableData.unit,
+      quantity: editableData.quantity,
+      location: editableData.location,
+      description: editableData.description,
+    };
+
+    try {
+      const response = await axiosPrivate[method](endpoint, payload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      // Update the state based on the modal mode
+      if (modalMode === 'edit') {
+        setData((currentData) =>
+          currentData.map((item) =>
+            item.id === editableData.id ? { ...item, ...response.data } : item
+          )
+        );
+      } else {
+        setData((currentData) => [...currentData, response.data]);
+      }
+
+      // Reset form and close modal
       setEditableData({
         type: '',
         source: '',
@@ -120,7 +259,18 @@ const ReportEmployeeCommuting = () => {
         quantity: '',
         location: '',
         description: '',
-      }); // Reset form
+      });
+      setShowContentModal(false);
+    } catch (err) {
+      if (!axios.isCancel(err)) {
+        console.error('Submission failed:', err);
+        const errorMsg = err.response?.data.message || 'An error occurred.';
+        if (err.response?.status === 403) {
+          navigate('/sign-in', { state: { from: location }, replace: true });
+        } else {
+          alert(`Error: ${errorMsg}`);
+        }
+      }
     }
   };
 
