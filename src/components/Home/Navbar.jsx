@@ -25,6 +25,10 @@ const Navbar = () => {
       <div className="flex justify-between items-center p-4">
         <div className="text-xl font-bold text-blue-500">TranXEnergy</div>
         <div className="hidden space-x-4 md:flex">
+
+        {/* Home button, Solutions, Certifications, COmpany (Newsletter, about us), Career, FAQ
+ */}
+
           <a
             href="#home"
             className="text-gray-600 hover:text-blue-500 transition duration-300"
@@ -32,28 +36,34 @@ const Navbar = () => {
             Home
           </a>
           <a
-            href="#about"
+            href="#solutions"
             className="text-gray-600 hover:text-blue-500 transition duration-300"
           >
-            About
+            Solutions
           </a>
           <a
-            href="#features"
+            href="#certifications"
             className="text-gray-600 hover:text-blue-500 transition duration-300"
           >
-            Features
+            Certifications
           </a>
           <a
-            href="#testimonials"
+            href="#aboutus"
             className="text-gray-600 hover:text-blue-500 transition duration-300"
           >
-            Testimonials
+            About Us
           </a>
           <a
-            href="#contact"
+            href="#career"
             className="text-gray-600 hover:text-blue-500 transition duration-300"
           >
-            Contact
+            Career
+          </a>
+          <a
+            href="#faq"
+            className="text-gray-600 hover:text-blue-500 transition duration-300"
+          >
+            FAQ
           </a>
         </div>
         <div className="flex space-x-2">

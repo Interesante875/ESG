@@ -4,3 +4,8 @@ export { default as About } from './About';
 export { default as FeaturesSection } from './FeaturesSection';
 export { default as TestimonialsSection } from './TestimonialsSection';
 export { default as ContactSection } from './ContactSection';
+export { default as WhyUs } from './WhyUs';
+export { default as Partners } from './Partners';
+export { default as RatingSection } from './RatingSection';
+export { default as RatingCard } from './RatingCard';
+export { default as StepSection } from './StepSection';

@@ -45,7 +45,7 @@ const Home = () => {
       </motion.p>
       <motion.div variants={itemVariants} whileHover="hover" whileTap="tap">
         <button className="bg-white text-blue-500 px-6 py-3 rounded-full font-semibold shadow-lg transition-all transform hover:-translate-y-1">
-          Discover More
+          Request a Demo
         </button>
       </motion.div>
     </motion.div>

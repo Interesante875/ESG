@@ -7,6 +7,10 @@ import {
   FeaturesSection,
   TestimonialsSection,
   ContactSection,
+  WhyUs,
+  Partners,
+  RatingSection,
+  StepSection
 } from '../components/Home';
 
 const HomePage = () => {
@@ -32,7 +36,11 @@ const HomePage = () => {
         <Home />
         <About />
         <FeaturesSection />
+        <WhyUs/>
+        <StepSection/>
         <TestimonialsSection />
+        <Partners/>
+        <RatingSection/>
         <ContactSection />
       </motion.div>
     </div>
